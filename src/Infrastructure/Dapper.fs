@@ -1,0 +1,78 @@
+namespace WebApp.Infrastructure.Dapper
+
+open System
+open Dapper
+
+open WebApp.Domain.Invariants
+
+[<RequireQualifiedAccess>]
+module Dapper =
+
+    type private StringContainerHandler<'T>(ofString: string -> 'T option, getValue: 'T -> string) =
+        inherit SqlMapper.TypeHandler<'T>()
+
+        let typeName = typeof<'T>.Name
+
+        override _.SetValue(param, value) = param.Value <- getValue value
+
+        override _.Parse value =
+            value :?> string
+            |> ofString
+            |> Option.defaultWith (fun () -> failwithf "The value %O cannot be parsed into a %s" value typeName)
+
+    type private StringContainerOptionHandler<'T>(ofString: string -> 'T option, getValue: 'T -> string) =
+        inherit SqlMapper.TypeHandler<option<'T>>()
+
+        override _.SetValue(param, value) =
+            param.Value <-
+                (match value with
+                 | Some t -> getValue t
+                 | None -> null)
+
+        override _.Parse value = value :?> string |> ofString
+
+    type private OptionHandler<'T>() =
+        inherit SqlMapper.TypeHandler<option<'T>>()
+
+        override _.SetValue(param, value) =
+            let valueOrNull =
+                match value with
+                | Some t -> box t
+                | None -> null
+
+            param.Value <- valueOrNull
+
+        override _.Parse value =
+            if isNull value || value = box DBNull.Value then
+                None
+            else
+                Some(value :?> 'T)
+
+    let private singleton =
+        lazy
+            (
+             // primitive type wrapped in an option
+             SqlMapper.AddTypeHandler(OptionHandler<Guid>())
+             SqlMapper.AddTypeHandler(OptionHandler<byte>())
+             SqlMapper.AddTypeHandler(OptionHandler<int16>())
+             SqlMapper.AddTypeHandler(OptionHandler<int>())
+             SqlMapper.AddTypeHandler(OptionHandler<int64>())
+             SqlMapper.AddTypeHandler(OptionHandler<uint16>())
+             SqlMapper.AddTypeHandler(OptionHandler<uint>())
+             SqlMapper.AddTypeHandler(OptionHandler<uint64>())
+             SqlMapper.AddTypeHandler(OptionHandler<float>())
+             SqlMapper.AddTypeHandler(OptionHandler<decimal>())
+             SqlMapper.AddTypeHandler(OptionHandler<float32>())
+             SqlMapper.AddTypeHandler(OptionHandler<string>())
+             SqlMapper.AddTypeHandler(OptionHandler<char>())
+             SqlMapper.AddTypeHandler(OptionHandler<DateTime>())
+             SqlMapper.AddTypeHandler(OptionHandler<DateTimeOffset>())
+             SqlMapper.AddTypeHandler(OptionHandler<bool>())
+             SqlMapper.AddTypeHandler(OptionHandler<TimeSpan>())
+             // string wrapped in a container
+             SqlMapper.AddTypeHandler(StringContainerHandler(Text.OfString, (fun x -> x.Value)))
+             // string wrapped in an optional container
+             SqlMapper.AddTypeHandler(StringContainerOptionHandler(Text.OfString, (fun x -> x.Value))))
+
+    /// Register Dapper type handlers
+    let registerTypeHandlers () = singleton.Force()
