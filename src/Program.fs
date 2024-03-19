@@ -24,7 +24,7 @@ open WebApp.Infrastructure.Serilog
 open WebApp.Infrastructure.Dapper
 open WebApp.Infrastructure.Options
 open WebApp.Infrastructure.ErrorHandlerMiddleware
-open WebApp.HttpHandlers
+open WebApp.RouteHandlers
 
 [<RequireQualifiedAccess>]
 module Program =
@@ -120,7 +120,7 @@ module Program =
                 app.UseAuthorization() |> ignore
                 app.UseAntiforgery() |> ignore
 
-                app.RegisterDemoHttpHandlers()
+                app.MapDemoRouteHandlers()
 
                 app.Run()
 

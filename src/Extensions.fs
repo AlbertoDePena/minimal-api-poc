@@ -11,9 +11,9 @@ open FsToolkit.ErrorHandling
 [<AutoOpen>]
 module DelegateExtensions =
 
-    type HttpHandler = Func<HttpContext, Task<IResult>>
+    type RouteHandler = Func<HttpContext, Task<IResult>>
 
-    let handleHttp (handler: HttpContext -> Task<IResult>) : HttpHandler =
+    let handleRoute (handler: HttpContext -> Task<IResult>) : RouteHandler =
         Func<HttpContext, Task<IResult>>(handler)
 
 [<AutoOpen>]
