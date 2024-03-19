@@ -109,8 +109,8 @@ module Program =
                     Console.WriteLine("Flushing telemetry...")
                     Thread.Sleep(5000))
                 |> ignore
-
-                if builder.Environment.IsDevelopment() then
+                
+                if app.Environment.IsDevelopment() then
                     app.UseDeveloperExceptionPage() |> ignore
                 else
                     app.UseMiddleware<ErrorHandlerMiddleware>() |> ignore
