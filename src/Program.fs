@@ -2,17 +2,12 @@ namespace WebApp
 
 open System
 open System.Threading
-open System.Text
-open System.Threading.Tasks
 
 open Microsoft.ApplicationInsights
 open Microsoft.ApplicationInsights.Extensibility
 
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Authentication.OpenIdConnect
-open Microsoft.AspNetCore.Authorization
-open Microsoft.AspNetCore.Mvc
-open Microsoft.AspNetCore.Mvc.Authorization
 open Microsoft.AspNetCore.CookiePolicy
 open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
@@ -29,7 +24,7 @@ open WebApp.Infrastructure.Serilog
 open WebApp.Infrastructure.Dapper
 open WebApp.Infrastructure.Options
 open WebApp.Infrastructure.ErrorHandlerMiddleware
-open WebApp.Infrastructure.HtmlTemplate
+open WebApp.HttpHandlers
 
 [<RequireQualifiedAccess>]
 module Program =
@@ -125,18 +120,7 @@ module Program =
                 app.UseAuthorization() |> ignore
                 app.UseAntiforgery() |> ignore
 
-                let sayHelloHandler: HttpHandler =
-                    handleHttp (fun httpContext -> task { return Results.Ok "Hello World!" })
-
-                let htmlHandler: HttpHandler =
-                    handleHttp (fun httpContext ->
-                        task {
-                            let htmlContent = Html.load "<div>Hello Html!</div>" |> Html.render
-                            return Results.Html htmlContent
-                        })
-
-                app.MapGet("/", sayHelloHandler).RequireAuthorization() |> ignore
-                app.MapGet("/html", htmlHandler).RequireAuthorization() |> ignore
+                app.RegisterDemoHttpHandlers()
 
                 app.Run()
 
