@@ -1,4 +1,4 @@
-namespace WebApp
+namespace WebApp.Extensions
 
 open System
 open System.Text

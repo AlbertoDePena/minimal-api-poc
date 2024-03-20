@@ -1,6 +1,6 @@
 ﻿namespace WebApp.RouteHandlers
 
-open WebApp
+open WebApp.Extensions
 open WebApp.Infrastructure.HtmlTemplate
 open Microsoft.AspNetCore.Http
 
