@@ -120,7 +120,8 @@ module Program =
                 app.UseAuthorization() |> ignore
                 app.UseAntiforgery() |> ignore
 
-                app.MapDemoRouteHandlers()
+                app.MapGet("SayHello", SayHelloHandler.handle).RequireAuthorization() |> ignore
+                app.MapGet("HelloWorld", HelloWorldHandler.handle).RequireAuthorization() |> ignore
 
                 app.Run()
 
