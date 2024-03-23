@@ -5,6 +5,8 @@ open System.Text
 open System.Threading.Tasks
 
 open Microsoft.AspNetCore.Http
+open Microsoft.Extensions.DependencyInjection
+open Microsoft.Extensions.Logging
 
 open FsToolkit.ErrorHandling
 
@@ -15,6 +17,17 @@ module DelegateExtensions =
 
     let handleRoute (handler: HttpContext -> Task<IResult>) : RouteHandler =
         Func<HttpContext, Task<IResult>>(handler)
+
+[<AutoOpen>]
+module HttpContextExtensions =
+
+    type HttpContext with
+        
+        member this.GetService<'T>() =
+            this.RequestServices.GetRequiredService<'T>()
+
+        member this.GetLogger (name : string) =
+            this.GetService<ILoggerFactory>().CreateLogger name
 
 [<AutoOpen>]
 module HttpRequestExtensions =
