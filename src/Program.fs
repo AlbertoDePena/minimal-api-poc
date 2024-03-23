@@ -104,7 +104,7 @@ module Program =
                     Console.WriteLine("Flushing telemetry...")
                     Thread.Sleep(5000))
                 |> ignore
-                
+
                 if app.Environment.IsDevelopment() then
                     app.UseDeveloperExceptionPage() |> ignore
                 else
@@ -122,7 +122,9 @@ module Program =
 
                 app.MapGet("/", IndexHandler.handle).RequireAuthorization() |> ignore
                 app.MapGet("SayHello", SayHelloHandler.handle).RequireAuthorization() |> ignore
-                app.MapGet("HelloWorld", HelloWorldHandler.handle).RequireAuthorization() |> ignore
+
+                app.MapGet("HelloWorld", HelloWorldHandler.handle).RequireAuthorization()
+                |> ignore
 
                 app.Run()
 

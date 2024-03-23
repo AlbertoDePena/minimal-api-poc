@@ -1,0 +1,24 @@
+.loader-container {
+    position: relative;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader-container .loader {
+    position: relative;
+    height: 80px;
+    width: 80px;
+}
+
+.loader-container .htmx-request {
+    display: flex;
+}
+
+.loader-container.htmx-request {
+    display: flex;
+}
