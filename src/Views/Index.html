@@ -13,23 +13,14 @@
 </head>
 
 <body>
-    <div class="container">
-        <form>
-            <fieldset>
-                <label>
-                    First name
-                    <input name="first_name" placeholder="First name" autocomplete="given-name" />
-                </label>
-                <label>
-                    Email
-                    <input type="email" name="email" placeholder="Email" autocomplete="email" />
-                </label>
-            </fieldset>
-
-            <input type="submit" value="Subscribe" />
-        </form>
+    <div class="container" hx-indicator=".loader-container">
+        <button hx-target="#SayHelloResponse" hx-get="/SayHello">Click Me</button>
+        <div id="SayHelloResponse"></div>
+        <div class="loader-container">
+            <div class="loader"></div>
+        </div>
     </div>
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.11"></script>
     <script src="/js/main.js"></script>
 </body>
 
