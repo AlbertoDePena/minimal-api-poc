@@ -71,8 +71,10 @@ module Dapper =
              SqlMapper.AddTypeHandler(OptionHandler<TimeSpan>())
              // string wrapped in a container
              SqlMapper.AddTypeHandler(StringContainerHandler(Text.OfString, (fun x -> x.Value)))
+             SqlMapper.AddTypeHandler(StringContainerHandler(EmailAddress.OfString, (fun x -> x.Value)))
              // string wrapped in an optional container
-             SqlMapper.AddTypeHandler(StringContainerOptionHandler(Text.OfString, (fun x -> x.Value))))
+             SqlMapper.AddTypeHandler(StringContainerOptionHandler(Text.OfString, (fun x -> x.Value)))
+             SqlMapper.AddTypeHandler(StringContainerOptionHandler(EmailAddress.OfString, (fun x -> x.Value))))
 
     /// Register Dapper type handlers
     let registerTypeHandlers () = singleton.Force()
