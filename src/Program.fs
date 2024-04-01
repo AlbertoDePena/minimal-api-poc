@@ -144,6 +144,11 @@ module Program =
                     .RequireAuthorization()
                 |> ignore
 
+                app
+                    .MapDelete("TextClassification/RemoveLabel", TextClassificationHandler.handleRemoveLabel)
+                    .RequireAuthorization()
+                |> ignore
+
                 app.Run()
 
                 SuccessExitCode

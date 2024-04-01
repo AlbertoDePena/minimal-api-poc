@@ -7,6 +7,11 @@
     display: none;
     justify-content: center;
     align-items: center;
+    
+    transition: opacity .3s;    
+    border-radius: 6px;
+    opacity: 1;
+    z-index: 1;
 }
 
 .loader-container .loader {

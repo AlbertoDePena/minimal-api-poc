@@ -14,8 +14,6 @@ module Index =
             props.Labels
             (fun label ->
                 $"""<div class="label" id="{label.Id}" 
-                        hx-target="#TextSample"
-                        hx-swap="innerHTML"
                         hx-post="/TextClassification/AddLabel?labelId={label.Id}">{label.Name}
                     </div>""")
             ""
@@ -28,7 +26,7 @@ module Index =
             (fun label ->
                 $"""<div class="text-label" id="{label.Id}">
                         <div class="text">{label.Name}</div>
-                        <button @onclick="(() => RemoveLabel(label))">X</button>
+                        <button hx-delete="/TextClassification/RemoveLabel?labelId={label.Id}">X</button>
                     </div>""")
             ""
 
@@ -79,7 +77,7 @@ module Index =
                     </nav>
                 </div>
                 <div class="main-container">
-                    <main>
+                    <main hx-target="#TextSample" hx-swap="innerHTML">
                         <div>
                             <div class="panel">
                                 <div class="header">
@@ -89,8 +87,6 @@ module Index =
                                         <option value="{Filter.WithoutLabels}">Without Labels</option>
                                     </select>
                                     <button class="next" 
-                                        hx-target="#TextSample"
-                                        hx-swap="innerHTML"
                                         hx-get="/TextClassification/NextTextSample">
                                         Next
                                     </button>
