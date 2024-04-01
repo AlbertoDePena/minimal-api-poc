@@ -20,6 +20,6 @@ module IndexHandler =
                 let logger = httpContext.GetLogger LoggerCategoryName
                 logger.LogInformation("Requesting index view: CorrelationID {CorrelationId}", correlationId)
 
-                let htmlContent = Html.load "Views/Index.html" |> Html.render
+                let htmlContent = Html.load "Templates/Index.html" |> Html.render
                 return Results.Html htmlContent
             })
