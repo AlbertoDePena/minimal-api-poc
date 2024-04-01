@@ -76,6 +76,9 @@ module Program =
                     .AddSingleton<ITelemetryInitializer, AuthenticatedUserInitializer>()
                 |> ignore
 
+                builder.Services.AddSingleton<TextSampleDatabase>() |> ignore
+                builder.Services.AddSingleton<LabelDatabase>() |> ignore
+
                 builder.Host.UseSerilog(
                     Action<HostBuilderContext, IServiceProvider, LoggerConfiguration>
                         (fun context services loggerConfig ->
@@ -124,6 +127,21 @@ module Program =
                 app.MapGet("SayHello", SayHelloHandler.handle).RequireAuthorization() |> ignore
 
                 app.MapGet("HelloWorld", HelloWorldHandler.handle).RequireAuthorization()
+                |> ignore
+
+                app
+                    .MapGet("TextClassification", TextClassificationHandler.handle)
+                    .RequireAuthorization()
+                |> ignore
+
+                app
+                    .MapGet("TextClassification/NextTextSample", TextClassificationHandler.handleNextTextSample)
+                    .RequireAuthorization()
+                |> ignore
+
+                app
+                    .MapPost("TextClassification/AddLabel", TextClassificationHandler.handleAddLabel)
+                    .RequireAuthorization()
                 |> ignore
 
                 app.Run()

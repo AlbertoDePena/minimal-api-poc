@@ -15,6 +15,7 @@ type SharedProps =
       UserName: string
       GetAntiforgeryToken: unit -> AntiforgeryToken }
 
+[<AutoOpen>]
 module Html =
 
     let csrf (getAntiforgeryToken: unit -> AntiforgeryToken) : string =
@@ -35,6 +36,7 @@ module Html =
     let formatDateTimeOffset (dateTimeOffset: DateTimeOffset) : string =
         dateTimeOffset.ToString("o", CultureInfo.InvariantCulture)
 
+[<AutoOpen>]
 module HtmlAttribute =
 
     let disabled (value: bool) : string =
