@@ -9,25 +9,33 @@ open WebApp.Domain.TextClassification
 open WebApp.Views
 
 type TextSampleDatabase() =
-    let mutable dataSource = Map.empty<int, TextSample>
+    let dataSource = ResizeArray<TextSample>()
     let mutable currentIndex: int = -1
+    let mutable currentFilter: Filter = Filter.All
 
-    member this.GetTextSamples() =
-        if dataSource.IsEmpty then
+    member this.SetFilter(filter: Filter) = currentFilter <- filter
+
+    member this.GetTextSamples() : TextSample list =
+        if dataSource.Count = 0 then
             let data =
-                List.init 10 (fun index ->
+                Array.init 10 (fun index ->
                     let modelId = index + 1
 
                     let model =
                         { Id = modelId
-                          Value = sprintf "Text sample %i" modelId
+                          Text = sprintf "Text sample %i" modelId
                           Labels = List.empty }
 
-                    modelId, model)
+                    model)
 
-            dataSource <- data |> Map.ofList
+            dataSource.AddRange data
 
-        dataSource |> Map.toList |> List.map (fun (key, item) -> item)
+        let data = dataSource.ToArray() |> Array.toList
+
+        match currentFilter with
+        | Filter.All -> data
+        | Filter.WithLabels -> data |> List.filter (fun x -> not x.Labels.IsEmpty)
+        | Filter.WithoutLabels -> data |> List.filter (fun x -> x.Labels.IsEmpty)
 
     member this.GetCurrentTextSample() : TextSample =
         this.GetTextSamples()
@@ -44,32 +52,33 @@ type TextSampleDatabase() =
 
         this.GetCurrentTextSample()
 
-    member this.GetTextSampleById(id: int) : TextSample option = dataSource.TryFind id
+    member this.GetTextSampleById(id: int) : TextSample option =
+        this.GetTextSamples() |> List.tryFind (fun textSample -> textSample.Id = id)
 
     member this.UpdateTextSample(id: int, textSample: TextSample) : unit =
-        dataSource.TryFind id
-        |> Option.iter (fun item -> dataSource <- dataSource.Add(id, textSample))
+        this.GetTextSampleById id |> Option.iter (fun _ -> dataSource[id] <- textSample)
 
 type LabelDatabase() =
-    let mutable dataSource = Map.empty<int, Label>
+    let dataSource = ResizeArray<Label>()
 
-    member this.GetLabels() =
-        if dataSource.IsEmpty then
+    member this.GetLabels() : Label list =
+        if dataSource.Count = 0 then
             let data =
-                List.init 20 (fun index ->
+                Array.init 20 (fun index ->
                     let modelId = index + 1
 
                     let model =
                         { Id = modelId
                           Name = sprintf "Label %i" modelId }
 
-                    modelId, model)
+                    model)
 
-            dataSource <- data |> Map.ofList
+            dataSource.AddRange data
 
-        dataSource |> Map.toList |> List.map (fun (key, item) -> item)
+        dataSource.ToArray() |> Array.toList
 
-    member this.GetLabelById(id: int) : Label option = dataSource.TryFind id
+    member this.GetLabelById(id: int) : Label option =
+        this.GetLabels() |> List.tryFind (fun label -> label.Id = id)
 
 [<RequireQualifiedAccess>]
 module TextClassificationHandler =
@@ -86,11 +95,10 @@ module TextClassificationHandler =
                 let labels = labelDb.GetLabels()
                 let textSample = textSampleDb.GetNextTextSample()
 
-                let props: Index.IndexProps =
-                    { Labels = labels
-                      TextSample = textSample }
-
-                let htmlContent = Index.render props
+                let htmlContent =
+                    Index.render
+                        { Labels = labels
+                          TextSample = textSample }
 
                 return Results.Html htmlContent
             })
@@ -101,9 +109,7 @@ module TextClassificationHandler =
                 let textSampleDb = httpContext.GetService<TextSampleDatabase>()
                 let textSample = textSampleDb.GetNextTextSample()
 
-                let props: Index.TextSampleProps = { TextSample = textSample }
-
-                let htmlContent = Index.renderTextSample props
+                let htmlContent = Index.renderTextSample { TextSample = textSample }
 
                 return Results.Html htmlContent
             })
@@ -134,9 +140,7 @@ module TextClassificationHandler =
 
                         textSampleDb.UpdateTextSample(updatedTextSample.Id, updatedTextSample)
 
-                        let props: Index.TextSampleProps = { TextSample = updatedTextSample }
-
-                        let htmlContent = Index.renderTextSample props
+                        let htmlContent = Index.renderTextSample { TextSample = updatedTextSample }
 
                         return Results.Html htmlContent
             })
@@ -167,9 +171,28 @@ module TextClassificationHandler =
 
                         textSampleDb.UpdateTextSample(updatedTextSample.Id, updatedTextSample)
 
-                        let props: Index.TextSampleProps = { TextSample = updatedTextSample }
-
-                        let htmlContent = Index.renderTextSample props
+                        let htmlContent = Index.renderTextSample { TextSample = updatedTextSample }
 
                         return Results.Html htmlContent
+            })
+
+    let handleFilter: RouteHandler =
+        handleRoute (fun httpContext ->
+            task {
+                let filterOption =
+                    httpContext.Request.TryGetQueryStringValue "filter"
+                    |> Option.bind Filter.OfString
+
+                match filterOption with
+                | None -> return failwith "filter is required"
+                | Some filter ->
+                    let textSampleDb = httpContext.GetService<TextSampleDatabase>()
+
+                    textSampleDb.SetFilter filter
+
+                    let textSample = textSampleDb.GetCurrentTextSample()
+
+                    let htmlContent = Index.renderTextSample { TextSample = textSample }
+
+                    return Results.Html htmlContent
             })

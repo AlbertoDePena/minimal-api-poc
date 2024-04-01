@@ -14,6 +14,13 @@ type Filter =
         | WithLabels -> "With Labels"
         | WithoutLabels -> "Without Labels"
 
+    static member OfString(value: string) =
+        match value with
+        | "All" -> Some All
+        | "With Labels" -> Some WithLabels
+        | "Without Labels" -> Some WithoutLabels
+        | _ -> None
+
 type Label =
     { Id: int
       Name: string }
@@ -22,10 +29,10 @@ type Label =
 
 type TextSample =
     { Id: int
-      Value: string
+      Text: string
       Labels: Label list }
 
     static member Empty =
         { Id = 0
-          Value = String.Empty
+          Text = String.Empty
           Labels = List.empty }

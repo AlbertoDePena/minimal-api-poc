@@ -149,6 +149,11 @@ module Program =
                     .RequireAuthorization()
                 |> ignore
 
+                app
+                    .MapGet("TextClassification/Filter", TextClassificationHandler.handleFilter)
+                    .RequireAuthorization()
+                |> ignore
+
                 app.Run()
 
                 SuccessExitCode

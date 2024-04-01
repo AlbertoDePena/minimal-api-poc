@@ -36,7 +36,7 @@ module Index =
         $"""
             <div id="TextSample" class="content">
                 <p class="text-sample">
-                    {props.TextSample.Value}
+                    {props.TextSample.Text}
                 </p>
 
                 <div class="text-label-container">
@@ -81,7 +81,7 @@ module Index =
                         <div>
                             <div class="panel">
                                 <div class="header">
-                                    <select @onchange=OnFilterSelected>
+                                    <select name="filter" hx-get="/TextClassification/Filter">
                                         <option value="{Filter.All}">All</option>
                                         <option value="{Filter.WithLabels}">With labels</option>
                                         <option value="{Filter.WithoutLabels}">Without Labels</option>
