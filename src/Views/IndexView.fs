@@ -81,13 +81,14 @@ module Index =
                         <div>
                             <div class="panel">
                                 <div class="header">
-                                    <select name="filter" hx-get="/TextClassification/Filter">
+                                    <select id="filter" name="filter" hx-get="/TextClassification/Filter">
                                         <option value="{Filter.All}">All</option>
                                         <option value="{Filter.WithLabels}">With labels</option>
                                         <option value="{Filter.WithoutLabels}">Without Labels</option>
                                     </select>
                                     <button class="next" 
-                                        hx-get="/TextClassification/NextTextSample">
+                                        hx-get="/TextClassification/NextTextSample"
+                                        hx-include="#filter">
                                         Next
                                     </button>
                                 </div>

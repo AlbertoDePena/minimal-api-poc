@@ -106,12 +106,22 @@ module TextClassificationHandler =
     let handleNextTextSample: RouteHandler =
         handleRoute (fun httpContext ->
             task {
-                let textSampleDb = httpContext.GetService<TextSampleDatabase>()
-                let textSample = textSampleDb.GetNextTextSample()
+                let filterOption =
+                    httpContext.Request.TryGetQueryStringValue "filter"
+                    |> Option.bind Filter.OfString
 
-                let htmlContent = Index.renderTextSample { TextSample = textSample }
+                match filterOption with
+                | None -> return failwith "filter is required"
+                | Some filter ->
+                    let textSampleDb = httpContext.GetService<TextSampleDatabase>()
 
-                return Results.Html htmlContent
+                    textSampleDb.SetFilter filter
+
+                    let textSample = textSampleDb.GetNextTextSample()
+
+                    let htmlContent = Index.renderTextSample { TextSample = textSample }
+
+                    return Results.Html htmlContent
             })
 
     let handleAddLabel: RouteHandler =
