@@ -52,7 +52,7 @@ module IndexHandler =
                     |> Html.replace "All" Filter.All
                     |> Html.replace "WithLabels" Filter.WithLabels
                     |> Html.replace "WithoutLabels" Filter.WithoutLabels
-                    |> Html.replaceRaw "TextSample" textSampleHtml
+                    |> Html.replaceRaw "TextSampleHtml" textSampleHtml
                     |> Html.replaceList "Label" labels (fun label template ->
                         template |> Html.replace "Id" label.Id |> Html.replace "Name" label.Name)
                     |> Html.render
