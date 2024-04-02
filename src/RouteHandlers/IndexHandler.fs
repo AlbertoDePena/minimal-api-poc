@@ -8,6 +8,7 @@ open FsToolkit.ErrorHandling
 open WebApp.Extensions
 open WebApp.Domain.TextClassification
 open WebApp.Infrastructure.HtmlTemplate
+open WebApp.Views.Components
 
 [<RequireQualifiedAccess>]
 module IndexHandler =
@@ -36,21 +37,6 @@ module IndexHandler =
                 let textSample = textSampleDb.GetCurrentTextSample()
                 let labels = labelDb.GetLabels()
 
-                let textSampleComponent =
-                    Html.load "components/text-sample.html"
-                    |> Html.replace "TextSampleElementId" ElementId.TextSample
-                    |> Html.replace "Text" textSample.Text
-                    |> Html.replaceList "Label" textSample.Labels (fun label template ->
-                        template |> Html.replace "Id" label.Id |> Html.replace "Name" label.Name)
-                    |> Html.render
-
-                let selectLabelComponent =
-                    Html.load "components/select-label.html"
-                    |> Html.replace "LabelDataSourceElementId" ElementId.LabelDataSource
-                    |> Html.replaceList "Label" labels (fun label template ->
-                        template |> Html.replace "Id" label.Id |> Html.replace "Name" label.Name)
-                    |> Html.render
-
                 let htmlContent =
                     Html.load "index.html"
                     |> Html.replace "TextSampleElementId" ElementId.TextSample
@@ -58,8 +44,16 @@ module IndexHandler =
                     |> Html.replace "All" Filter.All
                     |> Html.replace "WithLabels" Filter.WithLabels
                     |> Html.replace "WithoutLabels" Filter.WithoutLabels
-                    |> Html.replaceRaw "TextSampleComponent" textSampleComponent
-                    |> Html.replaceRaw "SelectLabelComponent" selectLabelComponent
+                    |> Html.replaceRaw
+                        "TextSampleComponent"
+                        (TextSampleComponent.render
+                            { ElementId = ElementId.TextSample
+                              TextSample = textSample })
+                    |> Html.replaceRaw
+                        "SelectLabelComponent"
+                        (SelectLabelComponent.render
+                            { ElementId = ElementId.LabelDataSource
+                              Labels = labels })
                     |> Html.render
 
                 return Results.Html htmlContent
@@ -82,12 +76,9 @@ module IndexHandler =
                     let textSample = textSampleDb.GetNextTextSample()
 
                     let htmlContent =
-                        Html.load "components/text-sample.html"
-                        |> Html.replace "TextSampleElementId" ElementId.TextSample
-                        |> Html.replace "Text" textSample.Text
-                        |> Html.replaceList "Label" textSample.Labels (fun label template ->
-                            template |> Html.replace "Id" label.Id |> Html.replace "Name" label.Name)
-                        |> Html.render
+                        TextSampleComponent.render
+                            { ElementId = ElementId.TextSample
+                              TextSample = textSample }
 
                     return Results.Html htmlContent
             })
@@ -119,12 +110,9 @@ module IndexHandler =
                         textSampleDb.UpdateTextSample(updatedTextSample.Id, updatedTextSample)
 
                         let htmlContent =
-                            Html.load "components/text-sample.html"
-                            |> Html.replace "TextSampleElementId" ElementId.TextSample
-                            |> Html.replace "Text" updatedTextSample.Text
-                            |> Html.replaceList "Label" updatedTextSample.Labels (fun label template ->
-                                template |> Html.replace "Id" label.Id |> Html.replace "Name" label.Name)
-                            |> Html.render
+                            TextSampleComponent.render
+                                { ElementId = ElementId.TextSample
+                                  TextSample = updatedTextSample }
 
                         return Results.Html htmlContent
             })
@@ -156,12 +144,9 @@ module IndexHandler =
                         textSampleDb.UpdateTextSample(updatedTextSample.Id, updatedTextSample)
 
                         let htmlContent =
-                            Html.load "components/text-sample.html"
-                            |> Html.replace "TextSampleElementId" ElementId.TextSample
-                            |> Html.replace "Text" updatedTextSample.Text
-                            |> Html.replaceList "Label" updatedTextSample.Labels (fun label template ->
-                                template |> Html.replace "Id" label.Id |> Html.replace "Name" label.Name)
-                            |> Html.render
+                            TextSampleComponent.render
+                                { ElementId = ElementId.TextSample
+                                  TextSample = updatedTextSample }
 
                         return Results.Html htmlContent
             })
@@ -183,12 +168,9 @@ module IndexHandler =
                     let textSample = textSampleDb.GetCurrentTextSample()
 
                     let htmlContent =
-                        Html.load "components/text-sample.html"
-                        |> Html.replace "TextSampleElementId" ElementId.TextSample
-                        |> Html.replace "Text" textSample.Text
-                        |> Html.replaceList "Label" textSample.Labels (fun label template ->
-                            template |> Html.replace "Id" label.Id |> Html.replace "Name" label.Name)
-                        |> Html.render
+                        TextSampleComponent.render
+                            { ElementId = ElementId.TextSample
+                              TextSample = textSample }
 
                     return Results.Html htmlContent
             })

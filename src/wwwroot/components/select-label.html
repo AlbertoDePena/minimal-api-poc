@@ -2,7 +2,7 @@
     <header>Labels</header>
     <div>
         <input placeholder="Filter labels..." @oninput=OnFilterLabelChanged />
-        <div id="${LabelDataSourceElementId}">
+        <div id="${ElementId}">
             ${begin Label}
             <div id="${Label.Id}"
                  hx-post="/AddLabel?labelId=${Label.Id}">
