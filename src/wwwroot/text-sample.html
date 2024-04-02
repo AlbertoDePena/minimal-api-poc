@@ -1,0 +1,14 @@
+<div id="${TextSampleElementId}">
+    <p>
+        ${Text}
+    </p>
+
+    <div>
+        ${begin Label}
+        <div class="text-label" id="${Label.Id}">
+            <div class="text">${Label.Name}</div>
+            <button hx-delete="/RemoveLabel?labelId=${Label.Id}">X</button>
+        </div>
+        ${end Label}
+    </div>
+</div>

@@ -19,6 +19,8 @@ open Microsoft.Identity.Web
 
 open Serilog
 
+open WebApp.Domain.TextClassification
+open WebApp.Infrastructure.HtmlTemplate
 open WebApp.Infrastructure.Telemetry
 open WebApp.Infrastructure.Serilog
 open WebApp.Infrastructure.Dapper
@@ -108,6 +110,8 @@ module Program =
                     Thread.Sleep(5000))
                 |> ignore
 
+                Html.templateDirectory <- app.Environment.WebRootPath
+
                 if app.Environment.IsDevelopment() then
                     app.UseDeveloperExceptionPage() |> ignore
                 else
@@ -124,33 +128,20 @@ module Program =
                 app.UseAntiforgery() |> ignore
 
                 app.MapGet("/", IndexHandler.handle).RequireAuthorization() |> ignore
-                app.MapGet("SayHello", SayHelloHandler.handle).RequireAuthorization() |> ignore
-
-                app.MapGet("HelloWorld", HelloWorldHandler.handle).RequireAuthorization()
-                |> ignore
 
                 app
-                    .MapGet("TextClassification", TextClassificationHandler.handle)
+                    .MapGet("/NextTextSample", IndexHandler.handleNextTextSample)
                     .RequireAuthorization()
                 |> ignore
 
-                app
-                    .MapGet("TextClassification/NextTextSample", TextClassificationHandler.handleNextTextSample)
-                    .RequireAuthorization()
+                app.MapGet("/Filter", IndexHandler.handleFilter).RequireAuthorization()
+                |> ignore
+
+                app.MapPost("/AddLabel", IndexHandler.handleAddLabel).RequireAuthorization()
                 |> ignore
 
                 app
-                    .MapPost("TextClassification/AddLabel", TextClassificationHandler.handleAddLabel)
-                    .RequireAuthorization()
-                |> ignore
-
-                app
-                    .MapDelete("TextClassification/RemoveLabel", TextClassificationHandler.handleRemoveLabel)
-                    .RequireAuthorization()
-                |> ignore
-
-                app
-                    .MapGet("TextClassification/Filter", TextClassificationHandler.handleFilter)
+                    .MapDelete("/RemoveLabel", IndexHandler.handleRemoveLabel)
                     .RequireAuthorization()
                 |> ignore
 

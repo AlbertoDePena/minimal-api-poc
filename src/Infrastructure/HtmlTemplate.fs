@@ -110,27 +110,24 @@ type HtmlTemplate(htmlContent: string, identifier: string) =
 
     /// <exception cref="HtmlTemplateException"></exception>
     member this.Replace
-        (
-            identifier: Identifier,
-            items: 'a list,
-            mapping: ('a * HtmlTemplate) -> HtmlTemplate
-        ) : HtmlTemplate =
+        (identifier: Identifier, items: 'a list, mapping: ('a * HtmlTemplate) -> HtmlTemplate)
+        : HtmlTemplate =
         try
             if String.IsNullOrWhiteSpace identifier then
                 failwith "The identifier cannot be null/empty/white-space"
 
-            let listToken = sprintf "${list %s}" identifier
+            let beginToken = sprintf "${begin %s}" identifier
             let endToken = sprintf "${end %s}" identifier
 
             let innerHtmlContent = stringBuilder.ToString()
 
-            let listTokenIndex = innerHtmlContent.IndexOf(listToken)
+            let beginTokenIndex = innerHtmlContent.IndexOf(beginToken)
             let endTokenIndex = innerHtmlContent.IndexOf(endToken)
 
             let templateList =
                 innerHtmlContent
-                    .Substring(listTokenIndex, endTokenIndex - listTokenIndex)
-                    .Replace(listToken, "")
+                    .Substring(beginTokenIndex, endTokenIndex - beginTokenIndex)
+                    .Replace(beginToken, "")
                     .Replace(endToken, "")
                     .TrimStart()
                     .TrimEnd()
@@ -145,7 +142,7 @@ type HtmlTemplate(htmlContent: string, identifier: string) =
 
             stringBuilder
                 .Replace(templateList, htmlContents)
-                .Replace(listToken, "")
+                .Replace(beginToken, "")
                 .Replace(endToken, "")
             |> ignore
 
@@ -167,8 +164,7 @@ type HtmlTemplate(htmlContent: string, identifier: string) =
 [<RequireQualifiedAccess>]
 module Html =
 
-    let private currentDirectory =
-        Path.GetDirectoryName(Reflection.Assembly.GetExecutingAssembly().Location)
+    let mutable templateDirectory = ""
 
     let load (fileOrContent: FileOrContent) =
         if isNull fileOrContent then
@@ -176,7 +172,7 @@ module Html =
 
         let htmlContent =
             if fileOrContent.EndsWith(".html") then
-                Path.Combine(currentDirectory, fileOrContent) |> File.ReadAllText
+                Path.Combine(templateDirectory, fileOrContent) |> File.ReadAllText
             else
                 fileOrContent
 

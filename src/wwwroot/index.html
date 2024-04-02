@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Classification</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+    <link rel="stylesheet" href="/css/custom.css" />
+</head>
+
+<body hx-indicator=".loader-container">
+    <nav class="container-fluid">
+        <ul>
+            <li><strong>Text Classification</strong></li>
+        </ul>
+        <ul>
+            <li><a href="#">Text Samples</a></li>
+            <li><a href="#">Labels</a></li>
+        </ul>
+    </nav>
+
+    <main class="container" hx-target="#${TextSampleElementId}" hx-swap="innerHTML">
+        <div class="grid">
+            <div>
+                <fieldset role="group">
+                    <select id="${FilterElementId}" name="${FilterElementId}" title="Select a filter" hx-get="/Filter">
+                        <option value="${All}">All</option>
+                        <option value="${WithLabels}">With Labels</option>
+                        <option value="${WithoutLabels}">Without Labels</option>
+                    </select>
+                    <button class="next"
+                            hx-get="/NextTextSample"
+                            hx-include="#${FilterElementId}">
+                        Next
+                    </button>
+                </fieldset>
+
+                <article>
+                    <header>Text Sample</header>
+                    ${TextSample}
+                </article>
+            </div>
+
+            <article>
+                <header>Labels</header>
+                <div>
+                    <input placeholder="Filter labels..." @oninput=OnFilterLabelChanged />
+                    <div id="${LabelDataSourceElementId}">
+                        ${begin Label}
+                        <div id="${Label.Id}"
+                             hx-post="/AddLabel?labelId=${Label.Id}">
+                            ${Label.Name}
+                        </div>
+                        ${end Label}
+                    </div>
+                </div>
+            </article>
+        </div>        
+    </main>
+
+    <div class="loader-container">
+        <div class="loader"></div>
+    </div>
+
+    <script src="https://unpkg.com/htmx.org@1.9.11"></script>
+    <script src="/js/main.js"></script>
+</body>
+</html>
