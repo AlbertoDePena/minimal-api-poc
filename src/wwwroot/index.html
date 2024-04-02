@@ -22,8 +22,8 @@
         </ul>
     </nav>
 
-    <main class="container" hx-target="#${TextSampleElementId}" hx-swap="innerHTML">
-        <div class="grid">
+    <main class="container">
+        <div class="grid" hx-target="#${TextSampleElementId}" hx-swap="outerHTML">
             <div>
                 <fieldset role="group">
                     <select id="${FilterElementId}" name="${FilterElementId}" title="Select a filter" hx-get="/Filter">
@@ -38,26 +38,10 @@
                     </button>
                 </fieldset>
 
-                <article>
-                    <header>Text Sample</header>
-                    ${TextSampleHtml}
-                </article>
+                ${TextSampleComponent}
             </div>
 
-            <article>
-                <header>Labels</header>
-                <div>
-                    <input placeholder="Filter labels..." @oninput=OnFilterLabelChanged />
-                    <div id="${LabelDataSourceElementId}">
-                        ${begin Label}
-                        <div id="${Label.Id}"
-                             hx-post="/AddLabel?labelId=${Label.Id}">
-                            ${Label.Name}
-                        </div>
-                        ${end Label}
-                    </div>
-                </div>
-            </article>
+           ${SelectLabelComponent}
         </div>        
     </main>
 

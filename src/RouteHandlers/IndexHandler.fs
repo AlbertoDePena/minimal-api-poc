@@ -36,11 +36,18 @@ module IndexHandler =
                 let textSample = textSampleDb.GetCurrentTextSample()
                 let labels = labelDb.GetLabels()
 
-                let textSampleHtml =
-                    Html.load "text-sample.html"
+                let textSampleComponent =
+                    Html.load "components/text-sample.html"
                     |> Html.replace "TextSampleElementId" ElementId.TextSample
                     |> Html.replace "Text" textSample.Text
                     |> Html.replaceList "Label" textSample.Labels (fun label template ->
+                        template |> Html.replace "Id" label.Id |> Html.replace "Name" label.Name)
+                    |> Html.render
+
+                let selectLabelComponent =
+                    Html.load "components/select-label.html"
+                    |> Html.replace "LabelDataSourceElementId" ElementId.LabelDataSource
+                    |> Html.replaceList "Label" labels (fun label template ->
                         template |> Html.replace "Id" label.Id |> Html.replace "Name" label.Name)
                     |> Html.render
 
@@ -48,13 +55,11 @@ module IndexHandler =
                     Html.load "index.html"
                     |> Html.replace "TextSampleElementId" ElementId.TextSample
                     |> Html.replace "FilterElementId" ElementId.Filter
-                    |> Html.replace "LabelDataSourceElementId" ElementId.LabelDataSource
                     |> Html.replace "All" Filter.All
                     |> Html.replace "WithLabels" Filter.WithLabels
                     |> Html.replace "WithoutLabels" Filter.WithoutLabels
-                    |> Html.replaceRaw "TextSampleHtml" textSampleHtml
-                    |> Html.replaceList "Label" labels (fun label template ->
-                        template |> Html.replace "Id" label.Id |> Html.replace "Name" label.Name)
+                    |> Html.replaceRaw "TextSampleComponent" textSampleComponent
+                    |> Html.replaceRaw "SelectLabelComponent" selectLabelComponent
                     |> Html.render
 
                 return Results.Html htmlContent
@@ -77,7 +82,7 @@ module IndexHandler =
                     let textSample = textSampleDb.GetNextTextSample()
 
                     let htmlContent =
-                        Html.load "text-sample.html"
+                        Html.load "components/text-sample.html"
                         |> Html.replace "TextSampleElementId" ElementId.TextSample
                         |> Html.replace "Text" textSample.Text
                         |> Html.replaceList "Label" textSample.Labels (fun label template ->
@@ -114,7 +119,7 @@ module IndexHandler =
                         textSampleDb.UpdateTextSample(updatedTextSample.Id, updatedTextSample)
 
                         let htmlContent =
-                            Html.load "text-sample.html"
+                            Html.load "components/text-sample.html"
                             |> Html.replace "TextSampleElementId" ElementId.TextSample
                             |> Html.replace "Text" updatedTextSample.Text
                             |> Html.replaceList "Label" updatedTextSample.Labels (fun label template ->
@@ -151,7 +156,7 @@ module IndexHandler =
                         textSampleDb.UpdateTextSample(updatedTextSample.Id, updatedTextSample)
 
                         let htmlContent =
-                            Html.load "text-sample.html"
+                            Html.load "components/text-sample.html"
                             |> Html.replace "TextSampleElementId" ElementId.TextSample
                             |> Html.replace "Text" updatedTextSample.Text
                             |> Html.replaceList "Label" updatedTextSample.Labels (fun label template ->
@@ -178,7 +183,7 @@ module IndexHandler =
                     let textSample = textSampleDb.GetCurrentTextSample()
 
                     let htmlContent =
-                        Html.load "text-sample.html"
+                        Html.load "components/text-sample.html"
                         |> Html.replace "TextSampleElementId" ElementId.TextSample
                         |> Html.replace "Text" textSample.Text
                         |> Html.replaceList "Label" textSample.Labels (fun label template ->

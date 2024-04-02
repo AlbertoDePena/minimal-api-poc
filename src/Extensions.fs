@@ -22,12 +22,12 @@ module DelegateExtensions =
 module HttpContextExtensions =
 
     type HttpContext with
-        
+
         member this.GetService<'T>() =
             this.RequestServices.GetRequiredService<'T>()
 
-        member this.GetLogger (name : string) =
-            this.GetService<ILoggerFactory>().CreateLogger name
+        member this.GetLogger(categoryName: string) =
+            this.GetService<ILoggerFactory>().CreateLogger categoryName
 
 [<AutoOpen>]
 module HttpRequestExtensions =

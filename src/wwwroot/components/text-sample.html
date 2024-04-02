@@ -1,0 +1,14 @@
+<article id="${TextSampleElementId}">
+    <header>Text Sample</header>
+    <div>
+        <p>${Text}</p>
+        <div>
+            ${begin Label}
+            <div id="${Label.Id}">
+                <div>${Label.Name}</div>
+                <button hx-delete="/RemoveLabel?labelId=${Label.Id}">X</button>
+            </div>
+            ${end Label}
+        </div>
+    </div>
+</article>

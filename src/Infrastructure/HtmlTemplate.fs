@@ -135,8 +135,8 @@ type HtmlTemplate(htmlContent: string, identifier: string) =
             let htmlContents =
                 items
                 |> List.map (fun item ->
-                    let templateWithKey = HtmlTemplate(templateList, identifier)
-                    let itemTemplate = mapping (item, templateWithKey)
+                    let templateWithIdentifier = HtmlTemplate(templateList, identifier)
+                    let itemTemplate = mapping (item, templateWithIdentifier)
                     itemTemplate.Render())
                 |> String.concat ""
 
@@ -167,16 +167,19 @@ module Html =
     let mutable templateDirectory = ""
 
     let load (fileOrContent: FileOrContent) =
-        if isNull fileOrContent then
-            nameof fileOrContent |> sprintf "%s cannot be null" |> failwith
+        try
+            if isNull fileOrContent then
+                nameof fileOrContent |> sprintf "%s cannot be null" |> failwith
 
-        let htmlContent =
-            if fileOrContent.EndsWith(".html") then
-                Path.Combine(templateDirectory, fileOrContent) |> File.ReadAllText
-            else
-                fileOrContent
+            let htmlContent =
+                if fileOrContent.EndsWith(".html") then
+                    Path.Combine(templateDirectory, fileOrContent) |> File.ReadAllText
+                else
+                    fileOrContent
 
-        HtmlTemplate(htmlContent, "")
+            HtmlTemplate(htmlContent, "")
+        with ex ->
+            HtmlTemplateException ex |> raise
 
     let csrf getToken (template: HtmlTemplate) = template.WithAntiforgery(getToken)
 

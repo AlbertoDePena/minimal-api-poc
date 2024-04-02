@@ -1,0 +1,14 @@
+<article>
+    <header>Labels</header>
+    <div>
+        <input placeholder="Filter labels..." @oninput=OnFilterLabelChanged />
+        <div id="${LabelDataSourceElementId}">
+            ${begin Label}
+            <div id="${Label.Id}"
+                 hx-post="/AddLabel?labelId=${Label.Id}">
+                ${Label.Name}
+            </div>
+            ${end Label}
+        </div>
+    </div>
+</article>
