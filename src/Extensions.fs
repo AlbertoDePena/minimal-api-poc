@@ -5,6 +5,7 @@ open System.Text
 open System.Threading.Tasks
 
 open Microsoft.AspNetCore.Http
+open Microsoft.AspNetCore.Antiforgery
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Logging
 
@@ -17,17 +18,6 @@ module DelegateExtensions =
 
     let handleRoute (handler: HttpContext -> Task<IResult>) : RouteHandler =
         Func<HttpContext, Task<IResult>>(handler)
-
-[<AutoOpen>]
-module HttpContextExtensions =
-
-    type HttpContext with
-
-        member this.GetService<'T>() =
-            this.RequestServices.GetRequiredService<'T>()
-
-        member this.GetLogger(categoryName: string) =
-            this.GetService<ILoggerFactory>().CreateLogger categoryName
 
 [<AutoOpen>]
 module HttpRequestExtensions =
@@ -59,6 +49,31 @@ module HttpRequestExtensions =
         member this.IsHtmxBoosted() : bool =
             this.TryGetHeaderValue "HX-Boosted"
             |> Option.exists (String.IsNullOrWhiteSpace >> not)
+
+[<AutoOpen>]
+module HttpContextExtensions =
+    open WebApp.Views.Html
+
+    type HttpContext with
+
+        member this.GetService<'T>() =
+            this.RequestServices.GetRequiredService<'T>()
+
+        member this.GetLogger(categoryName: string) =
+            this.GetService<ILoggerFactory>().CreateLogger categoryName
+
+        member this.GetUserName() : string = this.User.Identity.Name
+
+        member this.GetSharedProps() : SharedProps =
+            { IsHtmxBoosted = this.Request.IsHtmxBoosted()
+              UserName = this.GetUserName()
+              GetAntiforgeryToken =
+                fun () ->
+                    let antiforgery = this.GetService<IAntiforgery>()
+                    let token = antiforgery.GetAndStoreTokens(this)
+
+                    { FormFieldName = token.FormFieldName
+                      RequestToken = token.RequestToken } }
 
 [<AutoOpen>]
 module ResultsExtensions =

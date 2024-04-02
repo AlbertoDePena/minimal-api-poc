@@ -108,3 +108,7 @@ type LabelDatabase() =
 
     member this.GetLabelById(id: int) : Label option =
         this.GetLabels() |> List.tryFind (fun label -> label.Id = id)
+
+    member this.SearchLabels(searchCriteria: string) : Label list =
+        this.GetLabels()
+        |> List.filter (fun label -> label.Name.Contains(searchCriteria, StringComparison.OrdinalIgnoreCase))

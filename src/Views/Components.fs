@@ -1,10 +1,10 @@
 ﻿namespace WebApp.Views.Components
 
 open WebApp.Domain.TextClassification
-open WebApp.Infrastructure.HtmlTemplate
 
 [<RequireQualifiedAccess>]
 module TextSampleComponent =
+    open WebApp.Views.Html
 
     [<NoComparison>]
     type Props =
@@ -12,22 +12,54 @@ module TextSampleComponent =
           TextSample: TextSample }
 
     let render (props: Props) =
-        Html.load "components/text-sample.html"
-        |> Html.replace "ElementId" props.ElementId
-        |> Html.replace "Text" props.TextSample.Text
-        |> Html.replaceList "Label" props.TextSample.Labels (fun label template ->
-            template |> Html.replace "Id" label.Id |> Html.replace "Name" label.Name)
-        |> Html.render
+
+        let renderLabel (label: Label) =
+            $"""
+            <div id="{label.Id}">
+                <div>{label.Name}</div>
+                <button hx-delete="/RemoveLabel?labelId={label.Id}">X</button>
+            </div>
+            """
+
+        $"""
+        <article id="{props.ElementId}">
+            <header>Text Sample</header>
+            <div>
+                <p>{props.TextSample.Text}</p>
+                <div>
+                    {forEach props.TextSample.Labels renderLabel ""}
+                </div>
+            </div>
+        </article>
+        """
 
 [<RequireQualifiedAccess>]
 module SelectLabelComponent =
+    open WebApp.Views.Html
 
     [<NoComparison>]
     type Props = { ElementId: obj; Labels: Label list }
 
     let render (props: Props) =
-        Html.load "components/select-label.html"
-        |> Html.replace "ElementId" props.ElementId
-        |> Html.replaceList "Label" props.Labels (fun label template ->
-            template |> Html.replace "Id" label.Id |> Html.replace "Name" label.Name)
-        |> Html.render
+
+        let renderLabel (label: Label) =
+            $"""
+            <div id="{label.Id}"
+                 hx-target="#text-sample"
+                 hx-post="/AddLabel?labelId={label.Id}">
+                {label.Name}
+            </div>
+            """
+
+        $"""
+        <article id="{props.ElementId}" hx-target="this" hx-swap="outerHTML">
+            <header>Labels</header>
+            <div>
+                <input name="label-filter" placeholder="Filter labels..."                              
+                       hx-get="/SearchLabels" />
+                <div>
+                    {forEach props.Labels renderLabel ""}                   
+                </div>
+            </div>
+        </article>
+        """

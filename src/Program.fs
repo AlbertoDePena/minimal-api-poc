@@ -20,7 +20,6 @@ open Microsoft.Identity.Web
 open Serilog
 
 open WebApp.Domain.TextClassification
-open WebApp.Infrastructure.HtmlTemplate
 open WebApp.Infrastructure.Telemetry
 open WebApp.Infrastructure.Serilog
 open WebApp.Infrastructure.Dapper
@@ -110,8 +109,6 @@ module Program =
                     Thread.Sleep(5000))
                 |> ignore
 
-                Html.templateDirectory <- app.Environment.WebRootPath
-
                 if app.Environment.IsDevelopment() then
                     app.UseDeveloperExceptionPage() |> ignore
                 else
@@ -127,7 +124,7 @@ module Program =
                 app.UseAuthorization() |> ignore
                 app.UseAntiforgery() |> ignore
 
-                app.MapGet("/", IndexHandler.handle).RequireAuthorization() |> ignore
+                app.MapGet("/", IndexHandler.handlePage).RequireAuthorization() |> ignore
 
                 app
                     .MapGet("/NextTextSample", IndexHandler.handleNextTextSample)
@@ -135,6 +132,11 @@ module Program =
                 |> ignore
 
                 app.MapGet("/Filter", IndexHandler.handleFilter).RequireAuthorization()
+                |> ignore
+
+                app
+                    .MapGet("/SearchLabels", IndexHandler.handleSearchLabels)
+                    .RequireAuthorization()
                 |> ignore
 
                 app.MapPost("/AddLabel", IndexHandler.handleAddLabel).RequireAuthorization()

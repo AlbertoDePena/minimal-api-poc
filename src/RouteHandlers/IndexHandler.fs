@@ -7,28 +7,16 @@ open FsToolkit.ErrorHandling
 
 open WebApp.Extensions
 open WebApp.Domain.TextClassification
-open WebApp.Infrastructure.HtmlTemplate
+open WebApp.Views
 open WebApp.Views.Components
 
 [<RequireQualifiedAccess>]
 module IndexHandler =
 
-    [<RequireQualifiedAccess>]
-    type ElementId =
-        | TextSample
-        | Filter
-        | LabelDataSource
-
-        override this.ToString() =
-            match this with
-            | TextSample -> "text-sample"
-            | Filter -> "filter"
-            | LabelDataSource -> "label-data-source"
-
     [<Literal>]
     let LoggerCategoryName = "Index"
 
-    let handle: RouteHandler =
+    let handlePage: RouteHandler =
         handleRoute (fun httpContext ->
             task {
                 let textSampleDb = httpContext.GetService<TextSampleDatabase>()
@@ -38,23 +26,10 @@ module IndexHandler =
                 let labels = labelDb.GetLabels()
 
                 let htmlContent =
-                    Html.load "index.html"
-                    |> Html.replace "TextSampleElementId" ElementId.TextSample
-                    |> Html.replace "FilterElementId" ElementId.Filter
-                    |> Html.replace "All" Filter.All
-                    |> Html.replace "WithLabels" Filter.WithLabels
-                    |> Html.replace "WithoutLabels" Filter.WithoutLabels
-                    |> Html.replaceRaw
-                        "TextSampleComponent"
-                        (TextSampleComponent.render
-                            { ElementId = ElementId.TextSample
-                              TextSample = textSample })
-                    |> Html.replaceRaw
-                        "SelectLabelComponent"
-                        (SelectLabelComponent.render
-                            { ElementId = ElementId.LabelDataSource
-                              Labels = labels })
-                    |> Html.render
+                    PageView.render
+                        { Shared = httpContext.GetSharedProps()
+                          TextSample = textSample
+                          Labels = labels }
 
                 return Results.Html htmlContent
             })
@@ -77,7 +52,7 @@ module IndexHandler =
 
                     let htmlContent =
                         TextSampleComponent.render
-                            { ElementId = ElementId.TextSample
+                            { ElementId = PageView.ElementId.TextSample
                               TextSample = textSample }
 
                     return Results.Html htmlContent
@@ -111,7 +86,7 @@ module IndexHandler =
 
                         let htmlContent =
                             TextSampleComponent.render
-                                { ElementId = ElementId.TextSample
+                                { ElementId = PageView.ElementId.TextSample
                                   TextSample = updatedTextSample }
 
                         return Results.Html htmlContent
@@ -145,7 +120,7 @@ module IndexHandler =
 
                         let htmlContent =
                             TextSampleComponent.render
-                                { ElementId = ElementId.TextSample
+                                { ElementId = PageView.ElementId.TextSample
                                   TextSample = updatedTextSample }
 
                         return Results.Html htmlContent
@@ -169,8 +144,28 @@ module IndexHandler =
 
                     let htmlContent =
                         TextSampleComponent.render
-                            { ElementId = ElementId.TextSample
+                            { ElementId = PageView.ElementId.TextSample
                               TextSample = textSample }
+
+                    return Results.Html htmlContent
+            })
+
+    let handleSearchLabels: RouteHandler =
+        handleRoute (fun httpContext ->
+            task {
+                let filterOption = httpContext.Request.TryGetQueryStringValue "label-filter"
+
+                match filterOption with
+                | None -> return failwith "filter is required"
+                | Some filter ->
+                    let labelDb = httpContext.GetService<LabelDatabase>()
+
+                    let labels = labelDb.SearchLabels(filter)
+
+                    let htmlContent =
+                        SelectLabelComponent.render
+                            { ElementId = PageView.ElementId.LabelDataSource
+                              Labels = labels }
 
                     return Results.Html htmlContent
             })
