@@ -27,7 +27,7 @@ module IndexView =
                 <link rel="stylesheet" href="/css/custom.css" />
             </head>
 
-            <body hx-indicator=".loader-container">
+            <body hx-indicator=".loader">
                 <nav class="container-fluid">
                     <ul>
                         <li><strong>Text Classification</strong></li>
@@ -43,9 +43,7 @@ module IndexView =
                     {props.MainContent}
                 </main>
 
-                <div class="loader-container">
-                    <div class="loader"></div>
-                </div>
+                <div class="loader"></div>
 
                 <script src="https://unpkg.com/htmx.org@1.9.11"></script>
                 <script src="/js/main.js"></script>

@@ -38,7 +38,9 @@ module IndexHandler =
     let handleNextTextSample: RouteHandler =
         handleRoute (fun httpContext ->
             task {
-                if httpContext.Request.IsHtmx() then
+                match httpContext.Request.IsHtmx() with
+                | false -> return Results.Redirect("/")
+                | true ->
                     let filterOption =
                         httpContext.Request.TryGetQueryStringValue "filter"
                         |> Option.bind Filter.OfString
@@ -58,14 +60,14 @@ module IndexHandler =
                                   TextSample = textSample }
 
                         return Results.Html htmlContent
-                else
-                    return Results.Redirect("/")
             })
 
     let handleAddLabel: RouteHandler =
         handleRoute (fun httpContext ->
             task {
-                if httpContext.Request.IsHtmx() then
+                match httpContext.Request.IsHtmx() with
+                | false -> return Results.Redirect("/")
+                | true ->
                     let labelIdOption =
                         httpContext.Request.TryGetQueryStringValue "labelId"
                         |> Option.map Int32.TryParse
@@ -95,14 +97,14 @@ module IndexHandler =
                                       TextSample = updatedTextSample }
 
                             return Results.Html htmlContent
-                else
-                    return Results.Redirect("/")
             })
 
     let handleRemoveLabel: RouteHandler =
         handleRoute (fun httpContext ->
             task {
-                if httpContext.Request.IsHtmx() then
+                match httpContext.Request.IsHtmx() with
+                | false -> return Results.Redirect("/")
+                | true ->
                     let labelIdOption =
                         httpContext.Request.TryGetQueryStringValue "labelId"
                         |> Option.map Int32.TryParse
@@ -132,14 +134,14 @@ module IndexHandler =
                                       TextSample = updatedTextSample }
 
                             return Results.Html htmlContent
-                else
-                    return Results.Redirect("/")
             })
 
     let handleFilter: RouteHandler =
         handleRoute (fun httpContext ->
             task {
-                if httpContext.Request.IsHtmx() then
+                match httpContext.Request.IsHtmx() with
+                | false -> return Results.Redirect("/")
+                | true ->
                     let filterOption =
                         httpContext.Request.TryGetQueryStringValue "filter"
                         |> Option.bind Filter.OfString
@@ -159,14 +161,14 @@ module IndexHandler =
                                   TextSample = textSample }
 
                         return Results.Html htmlContent
-                else
-                    return Results.Redirect("/")
             })
 
     let handleSearchLabels: RouteHandler =
         handleRoute (fun httpContext ->
             task {
-                if httpContext.Request.IsHtmx() then
+                match httpContext.Request.IsHtmx() with
+                | false -> return Results.Redirect("/")
+                | true ->
                     let filterOption = httpContext.Request.TryGetQueryStringValue "label-filter"
 
                     match filterOption with
@@ -182,6 +184,4 @@ module IndexHandler =
                                   Labels = labels }
 
                         return Results.Html htmlContent
-                else
-                    return Results.Redirect("/")
             })
