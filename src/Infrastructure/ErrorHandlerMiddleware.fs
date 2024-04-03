@@ -1,12 +1,15 @@
 namespace WebApp.Infrastructure.ErrorHandlerMiddleware
 
 open System.Net
+open Microsoft.ApplicationInsights
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Logging
 
+open WebApp.Extensions
 open WebApp.Infrastructure.Exceptions
 
-type ErrorHandlerMiddleware(next: RequestDelegate, logger: ILogger<ErrorHandlerMiddleware>) =
+type ErrorHandlerMiddleware
+    (next: RequestDelegate, telemetryClient: TelemetryClient, logger: ILogger<ErrorHandlerMiddleware>) =
 
     [<Literal>]
     let AuthenticationErrorMessage = "The request is not authenticated."
@@ -21,6 +24,8 @@ type ErrorHandlerMiddleware(next: RequestDelegate, logger: ILogger<ErrorHandlerM
     member this.Invoke(context: HttpContext) =
         task {
             try
+                telemetryClient.Context.User.AuthenticatedUserId <- (context.GetUserName())
+
                 do! next.Invoke(context)
             with
             | :? AuthenticationException as ex ->
