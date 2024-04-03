@@ -52,7 +52,6 @@ module HttpRequestExtensions =
 
 [<AutoOpen>]
 module HttpContextExtensions =
-    open WebApp.Views.Html
 
     type HttpContext with
 
@@ -64,16 +63,8 @@ module HttpContextExtensions =
 
         member this.GetUserName() : string = this.User.Identity.Name
 
-        member this.GetSharedProps() : SharedProps =
-            { IsHtmxBoosted = this.Request.IsHtmxBoosted()
-              UserName = this.GetUserName()
-              GetAntiforgeryToken =
-                fun () ->
-                    let antiforgery = this.GetService<IAntiforgery>()
-                    let token = antiforgery.GetAndStoreTokens(this)
-
-                    { FormFieldName = token.FormFieldName
-                      RequestToken = token.RequestToken } }
+        member this.GetAntiforgeryToken() : AntiforgeryTokenSet =
+            this.GetService<IAntiforgery>().GetAndStoreTokens(this)
 
 [<AutoOpen>]
 module ResultsExtensions =

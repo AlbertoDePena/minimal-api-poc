@@ -27,7 +27,8 @@ module IndexHandler =
 
                 let htmlContent =
                     PageView.render
-                        { Shared = httpContext.GetSharedProps()
+                        { IsHtmxBoosted = httpContext.Request.IsHtmxBoosted()
+                          UserName = httpContext.GetUserName()
                           TextSample = textSample
                           Labels = labels }
 

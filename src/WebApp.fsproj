@@ -9,6 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="Extensions.fs" />
 		<Compile Include="Domain/Invariants.fs" />
 		<Compile Include="Domain/TextClassification.fs" />
 		<Compile Include="Infrastructure/Exceptions.fs" />
@@ -22,7 +23,6 @@
 		<Compile Include="Views\Components.fs" />
 		<Compile Include="Views\IndexView.fs" />
 		<Compile Include="Views\PageView.fs" />
-		<Compile Include="Extensions.fs" />
 		<Compile Include="RouteHandlers\IndexHandler.fs" />
 		<Compile Include="Program.fs" />
 	</ItemGroup>

@@ -22,7 +22,8 @@ module PageView =
     [<NoEquality>]
     [<NoComparison>]
     type Props =
-        { Shared: SharedProps
+        { IsHtmxBoosted: bool
+          UserName: string
           TextSample: TextSample
           Labels: Label list }
 
@@ -56,5 +57,6 @@ module PageView =
             """
 
         IndexView.render
-            { Shared = props.Shared
+            { IsHtmxBoosted = props.IsHtmxBoosted
+              UserName = props.UserName
               MainContent = mainContent }

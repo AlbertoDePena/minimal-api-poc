@@ -16,7 +16,7 @@ module TextSampleComponent =
         let renderLabel (label: Label) =
             $"""
             <div id="{label.Id}">
-                <div>{label.Name}</div>
+                <div>{encode label.Name}</div>
                 <button hx-delete="/RemoveLabel?labelId={label.Id}">X</button>
             </div>
             """
@@ -25,7 +25,7 @@ module TextSampleComponent =
         <article id="{props.ElementId}">
             <header>Text Sample</header>
             <div>
-                <p>{props.TextSample.Text}</p>
+                <p>{encode props.TextSample.Text}</p>
                 <div>
                     {forEach props.TextSample.Labels renderLabel ""}
                 </div>
@@ -47,7 +47,7 @@ module SelectLabelComponent =
             <div id="{label.Id}"
                  hx-target="#text-sample"
                  hx-post="/AddLabel?labelId={label.Id}">
-                {label.Name}
+                {encode label.Name}
             </div>
             """
 

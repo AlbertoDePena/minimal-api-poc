@@ -2,12 +2,12 @@
 
 [<RequireQualifiedAccess>]
 module IndexView =
-    open WebApp.Views.Html
 
     [<NoEquality>]
     [<NoComparison>]
     type Props =
-        { Shared: SharedProps
+        { IsHtmxBoosted: bool
+          UserName: string
           MainContent: string }
 
     let render (props: Props) : string =
@@ -35,7 +35,7 @@ module IndexView =
                     <ul>
                         <li><a href="#">Text Samples</a></li>
                         <li><a href="#">Labels</a></li>
-                        <li>{props.Shared.UserName}</li>
+                        <li>{props.UserName}</li>
                     </ul>
                 </nav>
 
@@ -53,6 +53,6 @@ module IndexView =
             </html>
             """
 
-        match props.Shared.IsHtmxBoosted with
+        match props.IsHtmxBoosted with
         | true -> props.MainContent
         | false -> indexContent

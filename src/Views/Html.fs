@@ -8,19 +8,10 @@ type AntiforgeryToken =
     { FormFieldName: string
       RequestToken: string }
 
-[<NoEquality>]
-[<NoComparison>]
-type SharedProps =
-    { IsHtmxBoosted: bool
-      UserName: string
-      GetAntiforgeryToken: unit -> AntiforgeryToken }
-
 [<AutoOpen>]
 module Html =
 
-    let antiforgery (getAntiforgeryToken: unit -> AntiforgeryToken) : string =
-        let token = getAntiforgeryToken ()
-
+    let csrf (token: AntiforgeryToken) : string =
         $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
 
     let encode (value: string) : string = WebUtility.HtmlEncode value
