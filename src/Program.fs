@@ -126,27 +126,6 @@ module Program =
 
                 app.MapGet("/", IndexHandler.handlePage).RequireAuthorization() |> ignore
 
-                app
-                    .MapGet("/NextTextSample", IndexHandler.handleNextTextSample)
-                    .RequireAuthorization()
-                |> ignore
-
-                app.MapGet("/Filter", IndexHandler.handleFilter).RequireAuthorization()
-                |> ignore
-
-                app
-                    .MapGet("/SearchLabels", IndexHandler.handleSearchLabels)
-                    .RequireAuthorization()
-                |> ignore
-
-                app.MapPost("/AddLabel", IndexHandler.handleAddLabel).RequireAuthorization()
-                |> ignore
-
-                app
-                    .MapDelete("/RemoveLabel", IndexHandler.handleRemoveLabel)
-                    .RequireAuthorization()
-                |> ignore
-
                 app.MapGet("/PageOne", PageHandler.handlePageOne).RequireAuthorization()
                 |> ignore
 

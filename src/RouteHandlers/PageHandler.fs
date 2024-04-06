@@ -20,10 +20,10 @@ module PageHandler =
                 let mainContent = "<div>Page one</div>"
 
                 let htmlContent =
-                    IndexView.render
+                    PageView.render
                         { PageName = "Page One"
-                          UserName = "Demo User"
-                          MainContent = mainContent }
+                          UserName = httpContext.GetUserName()
+                          PageContent = mainContent }
 
                 return Results.Html htmlContent
             })
@@ -35,10 +35,10 @@ module PageHandler =
                 let mainContent = "<div>Page Two</div>"
 
                 let htmlContent =
-                    IndexView.render
+                    PageView.render
                         { PageName = "Page Two"
-                          UserName = "Demo User"
-                          MainContent = mainContent }
+                          UserName = httpContext.GetUserName()
+                          PageContent = mainContent }
 
                 return Results.Html htmlContent
             })

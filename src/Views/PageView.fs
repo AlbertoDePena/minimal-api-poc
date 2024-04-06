@@ -1,62 +1,50 @@
 ﻿namespace WebApp.Views
 
-open WebApp.Domain.TextClassification
-open WebApp.Views.Html
-open WebApp.Views.Components
-
 [<RequireQualifiedAccess>]
 module PageView =
-
-    [<RequireQualifiedAccess>]
-    type ElementId =
-        | TextSample
-        | Filter
-        | LabelDataSource
-
-        override this.ToString() =
-            match this with
-            | TextSample -> "text-sample"
-            | Filter -> "filter"
-            | LabelDataSource -> "label-data-source"
 
     [<NoEquality>]
     [<NoComparison>]
     type Props =
-        { IsHtmxBoosted: bool
-          UserName: string
-          TextSample: TextSample
-          Labels: Label list }
+        { PageName: string
+          PageContent: string
+          UserName: string }
 
     let render (props: Props) : string =
-        let mainContent =
-            $"""
-            <div class="grid" hx-target="#{ElementId.TextSample}" hx-swap="outerHTML">
-                <div>
-                    <fieldset role="group">
-                        <select id="{ElementId.Filter}" name="{ElementId.Filter}" title="Select a filter" hx-get="/Filter">
-                            <option value="{Filter.All}">All</option>
-                            <option value="{Filter.WithLabels}">With Labels</option>
-                            <option value="{Filter.WithoutLabels}">Without Labels</option>
-                        </select>
-                        <button class="next"
-                                hx-get="/NextTextSample"
-                                hx-include="#{ElementId.Filter}">
-                            Next
-                        </button>
-                    </fieldset>
+        $"""
+            <!DOCTYPE html>
+            <html lang="en" data-theme="light">
+            <head>
+                <meta charset="UTF-8">
+                <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+                <meta http-equiv="Expires" content="0" />
+                <meta http-equiv="Pragma" content="no-cache" />
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>{props.PageName}</title>
+                <link rel="stylesheet" href="/css/pico.2.0.6.css" />
+                <link rel="stylesheet" href="/css/custom.css" />
+            </head>
 
-                    {TextSampleComponent.render
-                         { ElementId = ElementId.TextSample
-                           TextSample = props.TextSample }}
-                </div>
+            <body hx-indicator=".loader">
+                <nav class="container-fluid">
+                    <ul>
+                        <li><strong>HTMX POC</strong></li>
+                    </ul>
+                    <ul>
+                        <li><a hx-boost="true" href="/PageOne">Page One</a></li>
+                        <li><a hx-boost="true" href="/PageTwo">Page Two</a></li>
+                        <li>{props.UserName}</li>
+                    </ul>
+                </nav>
 
-                {SelectLabelComponent.render
-                     { ElementId = ElementId.LabelDataSource
-                       Labels = props.Labels }}
-            </div>        
+                <main class="container">
+                    {props.PageContent}
+                </main>
+
+                <div class="loader"></div>
+
+                <script src="/js/htmx.1.9.11.js"></script>
+                <script src="/js/main.js"></script>
+            </body>
+            </html>
             """
-
-        IndexView.render
-            { PageName = "Some Page"
-              UserName = props.UserName
-              MainContent = mainContent }
