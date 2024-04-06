@@ -19,6 +19,7 @@ open Microsoft.Identity.Web
 
 open Serilog
 
+open WebApp.Domain.TextClassification
 open WebApp.Infrastructure.Telemetry
 open WebApp.Infrastructure.Serilog
 open WebApp.Infrastructure.Dapper
@@ -123,24 +124,26 @@ module Program =
                 app.UseAuthorization() |> ignore
                 app.UseAntiforgery() |> ignore
 
-                app.MapGet("/", IndexHandler.handle).RequireAuthorization() |> ignore
-                app.MapGet("SayHello", SayHelloHandler.handle).RequireAuthorization() |> ignore
-
-                app.MapGet("HelloWorld", HelloWorldHandler.handle).RequireAuthorization()
-                |> ignore
+                app.MapGet("/", IndexHandler.handlePage).RequireAuthorization() |> ignore
 
                 app
-                    .MapGet("TextClassification", TextClassificationHandler.handle)
+                    .MapGet("/NextTextSample", IndexHandler.handleNextTextSample)
                     .RequireAuthorization()
                 |> ignore
 
-                app
-                    .MapGet("TextClassification/NextTextSample", TextClassificationHandler.handleNextTextSample)
-                    .RequireAuthorization()
+                app.MapGet("/Filter", IndexHandler.handleFilter).RequireAuthorization()
                 |> ignore
 
                 app
-                    .MapPost("TextClassification/AddLabel", TextClassificationHandler.handleAddLabel)
+                    .MapGet("/SearchLabels", IndexHandler.handleSearchLabels)
+                    .RequireAuthorization()
+                |> ignore
+
+                app.MapPost("/AddLabel", IndexHandler.handleAddLabel).RequireAuthorization()
+                |> ignore
+
+                app
+                    .MapDelete("/RemoveLabel", IndexHandler.handleRemoveLabel)
                     .RequireAuthorization()
                 |> ignore
 

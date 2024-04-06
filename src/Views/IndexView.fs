@@ -1,59 +1,18 @@
-namespace WebApp.Views
-
-open System
+﻿namespace WebApp.Views
 
 [<RequireQualifiedAccess>]
-module Index =
-    open WebApp.Domain.TextClassification
-    open WebApp.Infrastructure.Html
+module IndexView =
 
-    type LabelDataSourceProps = { Labels: Label list }
+    [<NoEquality>]
+    [<NoComparison>]
+    type Props =
+        { IsHtmxBoosted: bool
+          UserName: string
+          MainContent: string }
 
-    let renderLabelDataSource (props: LabelDataSourceProps) =
-        forEach
-            props.Labels
-            (fun label ->
-                $"""<div class="label" id="{label.Id}" 
-                        hx-target="#TextSample"
-                        hx-swap="innerHTML"
-                        hx-post="/TextClassification/AddLabel?labelId={label.Id}">{label.Name}
-                    </div>""")
-            ""
+    let render (props: Props) : string =
 
-    type TextSampleLabelsProps = { Labels: Label list }
-
-    let renderTextSampleLabels (props: TextSampleLabelsProps) =
-        forEach
-            props.Labels
-            (fun label ->
-                $"""<div class="text-label" id="{label.Id}">
-                        <div class="text">{label.Name}</div>
-                        <button @onclick="(() => RemoveLabel(label))">X</button>
-                    </div>""")
-            ""
-
-    type TextSampleProps = { TextSample: TextSample }
-
-    let renderTextSample (props: TextSampleProps) =
-        $"""
-            <div id="TextSample" class="content">
-                <p class="text-sample">
-                    {props.TextSample.Value}
-                </p>
-
-                <div class="text-label-container">
-                    {renderTextSampleLabels { Labels = props.TextSample.Labels }}
-                </div>
-            </div>
-        """
-
-    type IndexProps =
-        { Labels: Label list
-          TextSample: TextSample }
-
-    let render (props: IndexProps) =
-
-        let template =
+        let indexContent =
             $"""
             <!DOCTYPE html>
             <html lang="en">
@@ -63,60 +22,28 @@ module Index =
                 <meta http-equiv="Expires" content="0" />
                 <meta http-equiv="Pragma" content="no-cache" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Text Classification</title>                
-                <link rel="stylesheet" href="/css/text-classification.css" />
+                <title>Text Classification</title>
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
                 <link rel="stylesheet" href="/css/custom.css" />
             </head>
 
-            <body hx-indicator=".loader-container">
-                <div class="navbar-container">
-                    <nav class="navbar">
-                        <div class="navbar-title">Text Classification</div>
-                        <div class="navbar-links">
-                            <div class="navbar-link">Text Samples</div>
-                            <div class="navbar-link">Labels</div>
-                        </div>
-                    </nav>
-                </div>
-                <div class="main-container">
-                    <main>
-                        <div>
-                            <div class="panel">
-                                <div class="header">
-                                    <select @onchange=OnFilterSelected>
-                                        <option value="{Filter.All}">All</option>
-                                        <option value="{Filter.WithLabels}">With labels</option>
-                                        <option value="{Filter.WithoutLabels}">Without Labels</option>
-                                    </select>
-                                    <button class="next" 
-                                        hx-target="#TextSample"
-                                        hx-swap="innerHTML"
-                                        hx-get="/TextClassification/NextTextSample">
-                                        Next
-                                    </button>
-                                </div>
-                                {renderTextSample { TextSample = props.TextSample }}                                
-                            </div>
-                        </div>
+            <body hx-indicator=".loader">
+                <nav class="container-fluid">
+                    <ul>
+                        <li><strong>Text Classification</strong></li>
+                    </ul>
+                    <ul>
+                        <li><a href="#">Text Samples</a></li>
+                        <li><a href="#">Labels</a></li>
+                        <li>{props.UserName}</li>
+                    </ul>
+                </nav>
 
-                        <div>
-                            <div class="panel">
-                                <div class="header">
-                                    Labels
-                                </div>
-                                <div class="content">
-                                    <input class="filter-label-input" placeholder="Filter labels..." @oninput=OnFilterLabelChanged />
-                                    <div id="LabelDataSource" class="labels">
-                                        {renderLabelDataSource { Labels = props.Labels }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </main>
-                </div>
-                <div class="loader-container">
-                    <div class="loader"></div>
-                </div>
+                <main class="container">
+                    {props.MainContent}
+                </main>
+
+                <div class="loader"></div>
 
                 <script src="https://unpkg.com/htmx.org@1.9.11"></script>
                 <script src="/js/main.js"></script>
@@ -124,4 +51,6 @@ module Index =
             </html>
             """
 
-        template
+        match props.IsHtmxBoosted with
+        | true -> props.MainContent
+        | false -> indexContent

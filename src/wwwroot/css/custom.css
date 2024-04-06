@@ -1,24 +1,28 @@
-.loader-container {
-    position: relative;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
+.loader {
     display: none;
-    justify-content: center;
-    align-items: center;
+    margin: auto;
+    border: 5px solid #EAF0F6;
+    border-radius: 50%;
+    border-top: 5px solid #FF7A59;
+    width: 50px;
+    height: 50px;
+    animation: spinner .5s linear infinite;
 }
 
-.loader-container .loader {
-    position: relative;
-    height: 80px;
-    width: 80px;
-}
-
-.loader-container .htmx-request {
+.loader .htmx-request {
     display: flex;
 }
 
-.loader-container.htmx-request {
+.loader.htmx-request {
     display: flex;
+}
+
+@keyframes spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }

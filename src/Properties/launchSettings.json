@@ -1,6 +1,17 @@
 {
-  "$schema": "http://json.schemastore.org/launchsettings.json", 
+  "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
+    "WebAppWatch": {
+      "commandName": "Executable",
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5000",
+      "executablePath": "dotnet.exe",
+      "workingDirectory": "$(ProjectDir)",
+      "commandLineArgs": "watch --non-interactive run",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
     "WebApp": {
       "commandName": "Project",
       "dotnetRunMessages": true,
