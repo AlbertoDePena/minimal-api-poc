@@ -21,7 +21,7 @@
 		<Compile Include="Infrastructure/Serilog.fs" />
 		<Compile Include="Views\Html.fs" />
 		<Compile Include="Views\Components.fs" />
-		<Compile Include="Views\PageView.fs" />
+		<Compile Include="Views\Page.fs" />
 		<Compile Include="RouteHandlers\IndexHandler.fs" />
 		<Compile Include="RouteHandlers\PageHandler.fs" />
 		<Compile Include="Program.fs" />

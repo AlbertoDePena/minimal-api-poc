@@ -1,7 +1,7 @@
 ﻿namespace WebApp.Views
 
 [<RequireQualifiedAccess>]
-module PageView =
+module Page =
 
     [<NoEquality>]
     [<NoComparison>]

@@ -21,7 +21,7 @@ module IndexHandler =
             task {
 
                 let htmlContent =
-                    PageView.render
+                    Page.render
                         { UserName = httpContext.GetUserName()
                           PageName = "Index"
                           PageContent = "<div>Home Page<div/>" }
