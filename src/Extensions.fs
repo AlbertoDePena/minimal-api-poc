@@ -45,6 +45,9 @@ module HttpRequestExtensions =
         member this.TryGetQueryStringValue(key: string) : string option =
             this.Query.TryGetValue key |> Option.ofPair |> Option.map string
 
+        member this.TryGetRouteValue(key: string) : string option =
+            this.RouteValues.TryGetValue key |> Option.ofPair |> Option.map string
+
         member this.TryGetBearerToken() : string option =
             this.TryGetHeaderValue "Authorization"
             |> Option.filter (fun value -> value.Contains("Bearer "))
