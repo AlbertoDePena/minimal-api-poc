@@ -24,6 +24,7 @@
 		<Compile Include="Views\IndexView.fs" />
 		<Compile Include="Views\PageView.fs" />
 		<Compile Include="RouteHandlers\IndexHandler.fs" />
+		<Compile Include="RouteHandlers\PageHandler.fs" />
 		<Compile Include="Program.fs" />
 	</ItemGroup>
 

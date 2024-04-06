@@ -19,11 +19,17 @@ module Html =
     let forEach<'a> (items: 'a list) (mapping: 'a -> string) (separator: string) : string =
         items |> List.map mapping |> String.concat separator
 
-    let formatDateTime (dataTime: DateTime) : string =
+    let toIsoDateTime (dataTime: DateTime) : string =
         dataTime.ToString("o", CultureInfo.InvariantCulture)
 
-    let formatDateTimeOffset (dateTimeOffset: DateTimeOffset) : string =
+    let toHtmlDateTime (dataTime: DateTime) : string =
+        dataTime.ToString("r", CultureInfo.InvariantCulture)
+
+    let toIsoDateTimeOffset (dateTimeOffset: DateTimeOffset) : string =
         dateTimeOffset.ToString("o", CultureInfo.InvariantCulture)
+
+    let toHtmlDateTimeOffset (dateTimeOffset: DateTimeOffset) : string =
+        dateTimeOffset.ToString("r", CultureInfo.InvariantCulture)
 
 [<AutoOpen>]
 module HtmlAttribute =

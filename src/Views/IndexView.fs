@@ -6,7 +6,7 @@ module IndexView =
     [<NoEquality>]
     [<NoComparison>]
     type Props =
-        { IsHtmxBoosted: bool
+        { PageName: string
           UserName: string
           MainContent: string }
 
@@ -22,7 +22,7 @@ module IndexView =
                 <meta http-equiv="Expires" content="0" />
                 <meta http-equiv="Pragma" content="no-cache" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Text Classification</title>
+                <title>{props.PageName}</title>
                 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
                 <link rel="stylesheet" href="/css/custom.css" />
             </head>
@@ -33,8 +33,8 @@ module IndexView =
                         <li><strong>Text Classification</strong></li>
                     </ul>
                     <ul>
-                        <li><a href="#">Text Samples</a></li>
-                        <li><a href="#">Labels</a></li>
+                        <li><a hx-boost="true" href="/PageOne">Page One</a></li>
+                        <li><a hx-boost="true" href="/PageTwo">Page Two</a></li>
                         <li>{props.UserName}</li>
                     </ul>
                 </nav>
@@ -51,6 +51,4 @@ module IndexView =
             </html>
             """
 
-        match props.IsHtmxBoosted with
-        | true -> props.MainContent
-        | false -> indexContent
+        indexContent

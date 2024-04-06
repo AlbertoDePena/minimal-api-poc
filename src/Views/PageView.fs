@@ -57,6 +57,6 @@ module PageView =
             """
 
         IndexView.render
-            { IsHtmxBoosted = props.IsHtmxBoosted
+            { PageName = "Some Page"
               UserName = props.UserName
               MainContent = mainContent }

@@ -147,6 +147,12 @@ module Program =
                     .RequireAuthorization()
                 |> ignore
 
+                app.MapGet("/PageOne", PageHandler.handlePageOne).RequireAuthorization()
+                |> ignore
+
+                app.MapGet("/PageTwo", PageHandler.handlePageTwo).RequireAuthorization()
+                |> ignore
+
                 app.Run()
 
                 SuccessExitCode
