@@ -126,6 +126,9 @@ module Program =
 
                 app.MapGet("/", IndexHandler.handlePage).RequireAuthorization() |> ignore
 
+                app.MapPost("/HandleForm", IndexHandler.handleForm).RequireAuthorization()
+                |> ignore
+
                 app.MapGet("/PageOne", PageHandler.handlePageOne).RequireAuthorization()
                 |> ignore
 

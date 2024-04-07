@@ -4,15 +4,11 @@ open System
 open System.Globalization
 open System.Net
 
-type AntiforgeryToken =
-    { FormFieldName: string
-      RequestToken: string }
-
 [<AutoOpen>]
 module Html =
 
-    let csrf (token: AntiforgeryToken) : string =
-        $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
+    let csrf (formFieldName: string) (requestToken: string) : string =
+        $"""<input name="{formFieldName}" type="hidden" value="{requestToken}">"""
 
     let encode (value: string) : string = WebUtility.HtmlEncode value
 

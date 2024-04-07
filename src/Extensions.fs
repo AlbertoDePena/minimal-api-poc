@@ -69,6 +69,9 @@ module HttpContextExtensions =
         member this.GetAntiforgeryToken() : AntiforgeryTokenSet =
             this.GetService<IAntiforgery>().GetAndStoreTokens(this)
 
+        member this.ValidateAntiforgeryToken() : Task =
+            this.GetService<IAntiforgery>().ValidateRequestAsync(this)
+
 [<AutoOpen>]
 module ResultsExtensions =
 
