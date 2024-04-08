@@ -24,16 +24,26 @@ module HttpRequestExtensions =
 
     type HttpRequest with
 
+        member this.TryGetHeaderValues(key: string) : string list =
+            match this.Headers.TryGetValue key |> Option.ofPair with
+            | None -> []
+            | Some xs -> xs.ToArray() |> List.ofArray
+
         member this.TryGetHeaderValue(key: string) : string option =
-            this.Headers.TryGetValue key |> Option.ofPair |> Option.map string
+            this.TryGetHeaderValues key |> List.tryHead
 
         member this.TryGetFormValue(key: string) : string option =
             match this.HasFormContentType with
             | false -> None
             | true -> this.Form.TryGetValue key |> Option.ofPair |> Option.map string
 
+        member this.TryGetQueryStringValues(key: string) : string list =
+            match this.Query.TryGetValue key |> Option.ofPair with
+            | None -> []
+            | Some xs -> xs.ToArray() |> List.ofArray
+
         member this.TryGetQueryStringValue(key: string) : string option =
-            this.Query.TryGetValue key |> Option.ofPair |> Option.map string
+            this.TryGetQueryStringValues key |> List.tryHead
 
         member this.TryGetRouteValue(key: string) : string option =
             this.RouteValues.TryGetValue key |> Option.ofPair |> Option.map string
@@ -58,10 +68,10 @@ module HttpContextExtensions =
 
     type HttpContext with
 
-        member this.GetService<'T>() =
+        member this.GetService<'T>() : 'T =
             this.RequestServices.GetRequiredService<'T>()
 
-        member this.GetLogger(categoryName: string) =
+        member this.GetLogger(categoryName: string) : ILogger =
             this.GetService<ILoggerFactory>().CreateLogger categoryName
 
         member this.GetUserName() : string = this.User.Identity.Name

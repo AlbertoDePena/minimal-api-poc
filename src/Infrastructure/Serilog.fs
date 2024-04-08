@@ -11,7 +11,7 @@ open Serilog.Events
 
 open FsToolkit.ErrorHandling
 
-open WebApp.Infrastructure.Telemetry
+open WebApp.Infrastructure.ApplicationInfo
 
 [<RequireQualifiedAccess>]
 module Serilog =
@@ -36,8 +36,8 @@ module Serilog =
             .MinimumLevel.Override("System.Net.Http.HttpClient", infrastructureLogLevel)
             .Enrich.WithMachineName()
             .Enrich.FromLogContext()
-            .Enrich.WithProperty("Application", Application.Name)
-            .Enrich.WithProperty("Version", Application.Version)
+            .Enrich.WithProperty("Application", ApplicationInfo.Name)
+            .Enrich.WithProperty("Version", ApplicationInfo.Version)
             .WriteTo.Console()
             .WriteTo.ApplicationInsights(
                 services.GetRequiredService<TelemetryConfiguration>(),
