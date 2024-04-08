@@ -34,6 +34,7 @@ module Page =
                         <li><a hx-boost="true" href="/PageOne">Page One</a></li>
                         <li><a hx-boost="true" href="/PageTwo">Page Two</a></li>
                         <li>{props.UserName}</li>
+                        <li><button id="ThemeButton" type="button">Toggle Theme</button></li>
                     </ul>
                 </nav>
 
