@@ -10,6 +10,7 @@ module SayHelloHandler =
     let handle: EndpointHandler =
         handleEndpoint (fun httpContext ->
             task {
-                let htmlContent = Html.load "<p>Hello There!</p>" |> Html.render
+                let htmlContent = "<p>Hello There!</p>" |> HtmlTemplate.render {| |}
+
                 return Results.Html htmlContent
             })

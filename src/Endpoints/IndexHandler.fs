@@ -12,14 +12,18 @@ module IndexHandler =
     [<Literal>]
     let LoggerCategoryName = "Index"
 
+    type Model = { Name: string }
+
     let handle: EndpointHandler =
         handleEndpoint (fun httpContext ->
             task {
                 let correlationId = Guid.NewGuid() |> fun guid -> guid.ToString()
 
                 let logger = httpContext.GetLogger LoggerCategoryName
+
                 logger.LogInformation("Requesting index view: CorrelationID {CorrelationId}", correlationId)
 
-                let htmlContent = Html.load "Templates/Index.html" |> Html.render
-                return Results.Html htmlContent
+                let result = "Templates/Index.html" |> HtmlTemplate.render { Name = "Scriban!" }
+
+                return Results.Html result
             })

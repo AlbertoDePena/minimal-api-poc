@@ -10,6 +10,7 @@ module HelloWorldHandler =
     let handle: EndpointHandler =
         handleEndpoint (fun httpContext ->
             task {
-                let htmlContent = Html.load "<div>Hello World!</div>" |> Html.render
+                let htmlContent = "<div>Hello World!</div>" |> HtmlTemplate.render {| |}
+
                 return Results.Html htmlContent
             })
