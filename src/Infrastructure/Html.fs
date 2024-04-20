@@ -4,28 +4,13 @@ open System
 open System.Globalization
 open System.Net
 
-type AntiforgeryToken =
-    { FormFieldName: string
-      RequestToken: string }
-
-[<NoEquality>]
-[<NoComparison>]
-type SharedProps =
-    { IsHtmxBoosted: bool
-      UserName: string
-      GetAntiforgeryToken: unit -> AntiforgeryToken }
-
 [<AutoOpen>]
 module Html =
 
-    let csrf (getAntiforgeryToken: unit -> AntiforgeryToken) : string =
-        let token = getAntiforgeryToken ()
+    let csrf (formFieldName: string) (requestToken: string) : string =
+        $"""<input name="{formFieldName}" type="hidden" value="{requestToken}">"""
 
-        $"""<input name="{token.FormFieldName}" type="hidden" value="{token.RequestToken}">"""
-
-    let encodeString (value: string) : string = WebUtility.HtmlEncode value
-
-    let encodeText (text: WebApp.Domain.Invariants.Text) : string = encodeString text.Value
+    let encode (value: string) : string = WebUtility.HtmlEncode value
 
     let forEach<'a> (items: 'a list) (mapping: 'a -> string) (separator: string) : string =
         items |> List.map mapping |> String.concat separator
