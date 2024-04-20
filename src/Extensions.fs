@@ -11,22 +11,22 @@ open Microsoft.Extensions.Logging
 open FsToolkit.ErrorHandling
 
 [<AutoOpen>]
-module DelegateExtensions =
+module Endpoint =
 
-    type RouteHandler = Func<HttpContext, Task<IResult>>
+    type EndpointHandler = Func<HttpContext, Task<IResult>>
 
-    let handleRoute (handler: HttpContext -> Task<IResult>) : RouteHandler =
+    let handleEndpoint (handler: HttpContext -> Task<IResult>) : EndpointHandler =
         Func<HttpContext, Task<IResult>>(handler)
 
 [<AutoOpen>]
 module HttpContextExtensions =
 
     type HttpContext with
-        
+
         member this.GetService<'T>() =
             this.RequestServices.GetRequiredService<'T>()
 
-        member this.GetLogger (name : string) =
+        member this.GetLogger(name: string) =
             this.GetService<ILoggerFactory>().CreateLogger name
 
 [<AutoOpen>]

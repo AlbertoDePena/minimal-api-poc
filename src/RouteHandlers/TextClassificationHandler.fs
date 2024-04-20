@@ -60,8 +60,8 @@ module TextClassificationHandler =
     [<Literal>]
     let LoggerCategoryName = "TextClassification"
 
-    let handle: RouteHandler =
-        handleRoute (fun httpContext ->
+    let handle: EndpointHandler =
+        handleEndpoint (fun httpContext ->
             task {
                 let labelDb = httpContext.GetService<LabelDatabase>()
                 let textSampleDb = httpContext.GetService<TextSampleDatabase>()
@@ -78,8 +78,8 @@ module TextClassificationHandler =
                 return Results.Html htmlContent
             })
 
-    let handleNextTextSample: RouteHandler =
-        handleRoute (fun httpContext ->
+    let handleNextTextSample: EndpointHandler =
+        handleEndpoint (fun httpContext ->
             task {
                 let textSampleDb = httpContext.GetService<TextSampleDatabase>()
                 let textSample = textSampleDb.GetNextTextSample()
@@ -91,8 +91,8 @@ module TextClassificationHandler =
                 return Results.Html htmlContent
             })
 
-    let handleAddLabel: RouteHandler =
-        handleRoute (fun httpContext ->
+    let handleAddLabel: EndpointHandler =
+        handleEndpoint (fun httpContext ->
             task {
                 let labelIdOption =
                     httpContext.Request.TryGetQueryStringValue "labelId"

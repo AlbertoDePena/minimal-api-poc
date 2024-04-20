@@ -12,8 +12,8 @@ module IndexHandler =
     [<Literal>]
     let LoggerCategoryName = "Index"
 
-    let handle: RouteHandler =
-        handleRoute (fun httpContext ->
+    let handle: EndpointHandler =
+        handleEndpoint (fun httpContext ->
             task {
                 let correlationId = Guid.NewGuid() |> fun guid -> guid.ToString()
 
