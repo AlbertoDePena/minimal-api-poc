@@ -1,15 +1,15 @@
-﻿namespace WebApp.RouteHandlers
+﻿namespace WebApp.Endpoints
 
 open WebApp.Extensions
 open WebApp.Infrastructure.HtmlTemplate
 open Microsoft.AspNetCore.Http
 
 [<RequireQualifiedAccess>]
-module SayHelloHandler =
+module HelloWorldHandler =
 
     let handle: EndpointHandler =
         handleEndpoint (fun httpContext ->
             task {
-                let htmlContent = Html.load "<p>Hello There!</p>" |> Html.render
+                let htmlContent = Html.load "<div>Hello World!</div>" |> Html.render
                 return Results.Html htmlContent
             })

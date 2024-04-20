@@ -2,21 +2,12 @@ namespace WebApp.Extensions
 
 open System
 open System.Text
-open System.Threading.Tasks
 
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Logging
 
 open FsToolkit.ErrorHandling
-
-[<AutoOpen>]
-module Endpoint =
-
-    type EndpointHandler = Func<HttpContext, Task<IResult>>
-
-    let handleEndpoint (handler: HttpContext -> Task<IResult>) : EndpointHandler =
-        Func<HttpContext, Task<IResult>>(handler)
 
 [<AutoOpen>]
 module HttpContextExtensions =

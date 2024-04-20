@@ -24,7 +24,7 @@ open WebApp.Infrastructure.Serilog
 open WebApp.Infrastructure.Dapper
 open WebApp.Infrastructure.Options
 open WebApp.Infrastructure.ErrorHandlerMiddleware
-open WebApp.RouteHandlers
+open WebApp.Endpoints
 
 [<RequireQualifiedAccess>]
 module Program =

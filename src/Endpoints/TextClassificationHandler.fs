@@ -1,4 +1,4 @@
-namespace WebApp.RouteHandlers
+namespace WebApp.Endpoints
 
 open System
 open Microsoft.AspNetCore.Http
