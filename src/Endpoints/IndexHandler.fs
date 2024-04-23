@@ -2,7 +2,7 @@ namespace WebApp.Endpoints
 
 open System
 open WebApp.Extensions
-open WebApp.Infrastructure.HtmlTemplate
+open WebApp.Domain.Invariants
 open Microsoft.Extensions.Logging
 open Microsoft.AspNetCore.Http
 
@@ -12,7 +12,10 @@ module IndexHandler =
     [<Literal>]
     let LoggerCategoryName = "Index"
 
-    type Model = { Name: string }
+    type Model =
+        { Name: string
+          Items: string list
+          Description: Text }
 
     let handle: EndpointHandler =
         handleEndpoint (fun httpContext ->
@@ -23,7 +26,5 @@ module IndexHandler =
 
                 logger.LogInformation("Requesting index view: CorrelationID {CorrelationId}", correlationId)
 
-                let result = "Templates/Index.html" |> HtmlTemplate.render { Name = "Scriban!" }
-
-                return Results.Html result
+                return Results.Html "Hello World!"
             })
