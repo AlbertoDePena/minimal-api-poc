@@ -1,4 +1,4 @@
-namespace WebApp.Domain.Invariants
+namespace WebApp.Invariants
 
 [<RequireQualifiedAccess>]
 module String =
@@ -13,12 +13,9 @@ type EmailAddress =
     private
     | EmailAddress of string
 
-    /// <summary>Unwrap the EmailAddress to it's primitive value</summary>
-    member this.Value =
+    override this.ToString() =
         let (EmailAddress value) = this
         value
-
-    override this.ToString() = this.Value
 
     /// <summary>Try to convert a potentially null/empty/white-space string to an EmailAddress</summary>
     static member OfString(value: string) =
@@ -36,12 +33,9 @@ type Text =
     private
     | Text of string
 
-    /// <summary>Unwrap the Text to it's primitive value</summary>
-    member this.Value =
+    override this.ToString() =
         let (Text value) = this
         value
-
-    override this.ToString() = this.Value
 
     /// <summary>Try to convert a potentially null/empty/white-space string to a Text</summary>
     static member OfString(value: string) =

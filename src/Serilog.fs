@@ -1,4 +1,4 @@
-namespace WebApp.Infrastructure.Serilog
+namespace WebApp.Serilog
 
 open System
 
@@ -11,7 +11,7 @@ open Serilog.Events
 
 open FsToolkit.ErrorHandling
 
-open WebApp.Infrastructure.Telemetry
+open WebApp.Telemetry
 
 [<RequireQualifiedAccess>]
 module Serilog =

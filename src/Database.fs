@@ -1,4 +1,4 @@
-namespace WebApp.Infrastructure.Database
+namespace WebApp.Database
 
 [<RequireQualifiedAccess>]
 module DbConnection =
@@ -8,7 +8,7 @@ module DbConnection =
     open Microsoft.Data.SqlClient
 
     /// <exception cref="System.ArgumentException"></exception>
-    let create (connectionString: string) : IDbConnection =
+    let ofSql (connectionString: string) : IDbConnection =
         if String.IsNullOrWhiteSpace connectionString then
             invalidArg "dbConnectionString" "Database connection string cannot be null/empty/white-space"
         else

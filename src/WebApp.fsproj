@@ -9,17 +9,16 @@
   </PropertyGroup>
 
   <ItemGroup>    
-    <Compile Include="Extensions.fs" />
-	<Compile Include="Domain/Invariants.fs" />
-	<Compile Include="Domain/TextClassification.fs" />
-	<Compile Include="Infrastructure/Html.fs" />
-	<Compile Include="Infrastructure/Exceptions.fs" />
-	<Compile Include="Infrastructure/Options.fs" />
-	<Compile Include="Infrastructure/ErrorHandlerMiddleware.fs" />
-	<Compile Include="Infrastructure/Database.fs" />
-	<Compile Include="Infrastructure/Dapper.fs" />
-	<Compile Include="Infrastructure/Telemetry.fs" />
-	<Compile Include="Infrastructure/Serilog.fs" />	
+    <Compile Include="Invariants.fs" />
+	<Compile Include="Extensions.fs" />	
+	<Compile Include="Exceptions.fs" />
+	<Compile Include="Options.fs" />
+	<Compile Include="ErrorHandlerMiddleware.fs" />
+	<Compile Include="Database.fs" />
+	<Compile Include="Dapper.fs" />
+	<Compile Include="Telemetry.fs" />
+	<Compile Include="Serilog.fs" />	
+	<Compile Include="Views/Html.fs" />
 	<Compile Include="Views/IndexView.fs" />	
 	<Compile Include="Endpoints/Endpoint.fs" />
 	<Compile Include="Endpoints/IndexHandler.fs" />

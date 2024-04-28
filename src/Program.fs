@@ -1,4 +1,4 @@
-namespace WebApp
+namespace WebApp.Program
 
 open System
 open System.Threading
@@ -19,11 +19,11 @@ open Microsoft.Identity.Web
 
 open Serilog
 
-open WebApp.Infrastructure.Telemetry
-open WebApp.Infrastructure.Serilog
-open WebApp.Infrastructure.Dapper
-open WebApp.Infrastructure.Options
-open WebApp.Infrastructure.ErrorHandlerMiddleware
+open WebApp.Telemetry
+open WebApp.Serilog
+open WebApp.Dapper
+open WebApp.Options
+open WebApp.ErrorHandlerMiddleware
 open WebApp.Endpoints
 
 [<RequireQualifiedAccess>]
