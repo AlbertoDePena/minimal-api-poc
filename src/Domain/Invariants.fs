@@ -1,4 +1,4 @@
-namespace WebApp.Invariants
+namespace WebApp.Domain.Invariants
 
 /// <summary>
 /// Represents a non null/empty/white-space email address

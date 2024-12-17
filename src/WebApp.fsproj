@@ -9,7 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="Invariants.fs" />
+		<Compile Include="Domain\Invariants.fs" />
 		<Compile Include="Infrastructure\ApiMessageResponse.fs" />
 		<Compile Include="Infrastructure\Extensions.fs" />
 		<Compile Include="Infrastructure\Exceptions.fs" />
@@ -47,9 +47,5 @@
 		<PackageReference Include="System.Text.Json" Version="8.0.5" />
 		<PackageReference Include="RT.Comb" Version="4.0.1" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="wwwroot\" />
-	</ItemGroup>
-
+	
 </Project>

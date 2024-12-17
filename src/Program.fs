@@ -75,9 +75,9 @@ module Program =
             let openTelemetryBuilder =
                 if isDevelopment
                 then
-                    builder.Services.AddOpenTelemetry() :> IOpenTelemetryBuilder
+                    builder.Services.AddOpenTelemetry()
                 else
-                    builder.Services.AddOpenTelemetry().UseAzureMonitor() :> IOpenTelemetryBuilder
+                    builder.Services.AddOpenTelemetry().UseAzureMonitor()
 
             openTelemetryBuilder
                 .ConfigureResource(fun resourceBuilder ->

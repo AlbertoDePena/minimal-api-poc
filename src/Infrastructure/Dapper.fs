@@ -3,7 +3,7 @@ namespace WebApp.Infrastructure.Dapper
 open System
 open Dapper
 
-open WebApp.Invariants
+open WebApp.Domain.Invariants
 open WebApp.Infrastructure.Extensions
 
 [<RequireQualifiedAccess>]
