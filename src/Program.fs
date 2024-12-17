@@ -15,10 +15,12 @@ open Microsoft.Extensions.Configuration
 open Azure.Monitor.OpenTelemetry.AspNetCore
 
 open OpenTelemetry
+open OpenTelemetry.Exporter
 open OpenTelemetry.Logs
 open OpenTelemetry.Metrics
 open OpenTelemetry.Trace
 open OpenTelemetry.Resources
+open OpenTelemetry.Instrumentation.AspNetCore
 
 open Microsoft.Identity.Web
 
@@ -74,6 +76,10 @@ module Program =
             builder.Services.AddAuthorization() |> ignore
             builder.Services.AddAntiforgery() |> ignore
 
+            builder.Services.Configure<AspNetCoreTraceInstrumentationOptions>
+                (fun (options: AspNetCoreTraceInstrumentationOptions) -> options.RecordException <- true)
+            |> ignore
+
             let openTelemetryBuilder = builder.Services.AddOpenTelemetry()
 
             openTelemetryBuilder
@@ -83,14 +89,13 @@ module Program =
                         serviceVersion = Telemetry.Version,
                         serviceInstanceId = Environment.MachineName
                     )
-                    |> ignore)      
-                .WithLogging(fun loggerBuilder ->                         
+                    |> ignore)
+                .WithLogging(fun loggerBuilder ->
                     if isDevelopment then
                         loggerBuilder.AddConsoleExporter() |> ignore)
                 .WithMetrics(fun meterBuilder ->
                     meterBuilder.AddAspNetCoreInstrumentation() |> ignore
-                    meterBuilder.AddMeter("Microsoft.AspNetCore.Hosting") |> ignore
-                    meterBuilder.AddMeter("Microsoft.AspNetCore.Server.Kestrel") |> ignore
+                    meterBuilder.AddHttpClientInstrumentation() |> ignore
                     meterBuilder.AddMeter(Telemetry.ApplicationName) |> ignore
 
                     if isDevelopment then
@@ -111,7 +116,7 @@ module Program =
             then
                 openTelemetryBuilder.UseOtlpExporter() |> ignore
 
-            if
+            elif
                 builder.Configuration.GetValue<string> "APPLICATIONINSIGHTS_CONNECTION_STRING"
                 |> String.IsNullOrWhiteSpace
                 |> not
