@@ -3,9 +3,6 @@ namespace WebApp.Program
 open System
 open System.Threading
 
-open Microsoft.ApplicationInsights
-open Microsoft.ApplicationInsights.Extensibility
-
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Authentication.OpenIdConnect
 open Microsoft.AspNetCore.CookiePolicy
@@ -15,16 +12,22 @@ open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Options
 open Microsoft.Extensions.Configuration
 
+open Azure.Monitor.OpenTelemetry.AspNetCore
+
+open OpenTelemetry
+open OpenTelemetry.Trace
+open OpenTelemetry.Resources
+
 open Microsoft.Identity.Web
 
-open Serilog
-
 open WebApp.Infrastructure.Telemetry
-open WebApp.Infrastructure.Serilog
 open WebApp.Infrastructure.Dapper
 open WebApp.Infrastructure.Options
 open WebApp.Infrastructure.ErrorHandlerMiddleware
 open WebApp.Endpoints
+open Microsoft.AspNetCore.Diagnostics.HealthChecks
+open Microsoft.Extensions.Diagnostics.HealthChecks
+open HealthChecks.UI.Client
 
 [<RequireQualifiedAccess>]
 module Program =
@@ -38,97 +41,117 @@ module Program =
     [<EntryPoint>]
     let main args =
         try
-            try
-                Dapper.registerTypeHandlers ()
+            Dapper.registerTypeHandlers ()
 
-                let builder = WebApplication.CreateBuilder(args)
+            let builder = WebApplication.CreateBuilder(args)
 
-                builder.Services
-                    .AddOptions<DatabaseOptions>()
-                    .Configure<IConfiguration>(fun settings configuration ->
-                        configuration.GetSection("Database").Bind(settings))
-                |> ignore
+            let isDevelopment = builder.Environment.IsDevelopment()
 
-                builder.Services.Configure<CookiePolicyOptions>(
-                    Action<CookiePolicyOptions>(fun options ->
-                        options.Secure <- CookieSecurePolicy.Always
-                        options.HttpOnly <- HttpOnlyPolicy.Always
-                        options.MinimumSameSitePolicy <- SameSiteMode.Lax
-                        options.CheckConsentNeeded <- (fun context -> true)
-                        options.HandleSameSiteCookieCompatibility() |> ignore)
-                )
-                |> ignore
+            builder.Services
+                .AddOptions<DatabaseOptions>()
+                .Configure<IConfiguration>(fun settings configuration ->
+                    configuration.GetSection("Database").Bind(settings))
+            |> ignore
 
-                builder.Services
-                    .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-                    .AddMicrosoftIdentityWebApp(fun options -> builder.Configuration.Bind("AzureAd", options))
-                |> ignore
+            builder.Services.Configure<CookiePolicyOptions>(
+                Action<CookiePolicyOptions>(fun options ->
+                    options.Secure <- CookieSecurePolicy.Always
+                    options.HttpOnly <- HttpOnlyPolicy.Always
+                    options.MinimumSameSitePolicy <- SameSiteMode.Lax
+                    options.CheckConsentNeeded <- (fun context -> true)
+                    options.HandleSameSiteCookieCompatibility() |> ignore)
+            )
+            |> ignore
 
-                builder.Services.AddAuthorization() |> ignore
+            builder.Services
+                .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+                .AddMicrosoftIdentityWebApp(fun options -> builder.Configuration.Bind("AzureAd", options))
+            |> ignore
 
-                builder.Services.AddAntiforgery() |> ignore
+            builder.Services.AddSingleton<Telemetry>() |> ignore
+            builder.Services.AddAuthorization() |> ignore
+            builder.Services.AddAntiforgery() |> ignore
 
-                builder.Services.AddApplicationInsightsTelemetry() |> ignore
-
-                builder.Services
-                    .AddSingleton<ITelemetryInitializer, CloudRoleNameInitializer>()
-                    .AddSingleton<ITelemetryInitializer, ComponentVersionInitializer>()
-                    .AddSingleton<ITelemetryInitializer, AuthenticatedUserInitializer>()
-                |> ignore
-
-                builder.Host.UseSerilog(
-                    Action<HostBuilderContext, IServiceProvider, LoggerConfiguration>
-                        (fun context services loggerConfig ->
-                            Serilog.configure context.Configuration services loggerConfig)
-                )
-                |> ignore
-
-                builder.Services
-                    .AddHealthChecks()
-                    .AddSqlServer(
-                        connectionStringFactory =
-                            (fun services ->
-                                services.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString),
-                        name = "HTMX POC Database"
-                    )
-                |> ignore
-
-                let app = builder.Build()
-
-                let telemetryClient = app.Services.GetRequiredService<TelemetryClient>()
-                let lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>()
-                let applicationStopped = lifetime.ApplicationStopped
-
-                applicationStopped.Register(fun () ->
-                    telemetryClient.Flush()
-                    Console.WriteLine("Flushing telemetry...")
-                    Thread.Sleep(5000))
-                |> ignore
-
-                if app.Environment.IsDevelopment() then
-                    app.UseDeveloperExceptionPage() |> ignore
+            let openTelemetryBuilder =
+                if isDevelopment
+                then
+                    builder.Services.AddOpenTelemetry() :> IOpenTelemetryBuilder
                 else
-                    app.UseMiddleware<ErrorHandlerMiddleware>() |> ignore
-                    app.UseHsts() |> ignore
+                    builder.Services.AddOpenTelemetry().UseAzureMonitor() :> IOpenTelemetryBuilder
 
+            openTelemetryBuilder
+                .ConfigureResource(fun resourceBuilder ->
+                    resourceBuilder.AddService(
+                        serviceName = Telemetry.ApplicationName,
+                        serviceVersion = Telemetry.Version,
+                        serviceInstanceId = Environment.MachineName
+                    )
+                    |> ignore)
+                .WithMetrics(fun meterBuilder -> meterBuilder.AddMeter(Telemetry.ApplicationName) |> ignore)
+                .WithTracing(fun tracerBuilder ->
+                    tracerBuilder.AddSource(Telemetry.ApplicationName) |> ignore
+
+                    if isDevelopment then
+                        tracerBuilder.AddConsoleExporter() |> ignore)
+            |> ignore
+
+            builder.Services
+                .AddHealthChecks()
+                .AddSqlServer(
+                    connectionStringFactory =
+                        (fun services ->
+                            services.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString),
+                    name = "HTMX POC Database"
+                )
+            |> ignore
+
+            let app = builder.Build()
+
+            if app.Environment.IsDevelopment() then
+                app.UseDeveloperExceptionPage() |> ignore
+            else
+                app.UseMiddleware<ErrorHandlerMiddleware>() |> ignore
+                app.UseHsts() |> ignore
                 app.UseHttpsRedirection() |> ignore
-                app.UseStaticFiles() |> ignore
-                app.UseSerilogRequestLogging() |> ignore
-                app.UseCookiePolicy() |> ignore
-                app.UseRouting() |> ignore
-                app.UseAuthentication() |> ignore
-                app.UseAuthorization() |> ignore
-                app.UseAntiforgery() |> ignore
 
-                app.MapGet("/", IndexHandler.handle).RequireAuthorization() |> ignore
+            app.UseStaticFiles() |> ignore
+            app.UseCookiePolicy() |> ignore
+            app.UseRouting() |> ignore
+            app.UseAuthentication() |> ignore
+            app.UseAuthorization() |> ignore
+            app.UseAntiforgery() |> ignore
 
-                app.Run()
+            app.MapHealthChecks(
+                "/api/Health",
+                HealthCheckOptions(
+                    ResponseWriter =
+                        (fun httpContext healthReport ->
+                            task {
+                                if healthReport.Status = HealthStatus.Unhealthy then
+                                    return Results.StatusCode(statusCode = StatusCodes.Status503ServiceUnavailable)
+                                else
+                                    return Results.Ok()
+                            })
+                )
+            )
+            |> ignore
 
-                SuccessExitCode
-            with ex ->
-                Console.Error.WriteLine(ex)
+            app.MapHealthChecks(
+                "/api/HealthReport",
+                HealthCheckOptions(
+                    ResponseWriter =
+                        (fun httpContext healthReport ->
+                            UIResponseWriter.WriteHealthCheckUIResponse(httpContext, healthReport))
+                )
+            )
+            |> ignore
 
-                FailureExitCode
-        finally
-            Console.WriteLine("Flushing serilog...")
-            Log.CloseAndFlush()
+            app.MapGet("/", IndexHandler.handle).RequireAuthorization() |> ignore
+
+            app.Run()
+
+            SuccessExitCode
+        with ex ->
+            Console.Error.WriteLine(ex)
+
+            FailureExitCode

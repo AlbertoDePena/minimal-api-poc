@@ -1,10 +1,10 @@
 namespace WebApp.Infrastructure.ErrorHandlerMiddleware
 
-open System.Net
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Logging
 
 open WebApp.Infrastructure.Exceptions
+open WebApp.Infrastructure.ApiMessageResponse
 
 type ErrorHandlerMiddleware(next: RequestDelegate, logger: ILogger<ErrorHandlerMiddleware>) =
 
@@ -26,28 +26,30 @@ type ErrorHandlerMiddleware(next: RequestDelegate, logger: ILogger<ErrorHandlerM
             | :? AuthenticationException as ex ->
                 logger.LogDebug(AuthenticationException.EventId, ex, ex.Message)
 
-                context.Response.StatusCode <- HttpStatusCode.Unauthorized |> int
+                context.Response.StatusCode <- StatusCodes.Status401Unauthorized
 
-                return! context.Response.WriteAsJsonAsync({| message = AuthenticationErrorMessage |})
+                return!
+                    context.Response.WriteAsJsonAsync(
+                        ApiMessageResponse.Create(StatusCodes.Status401Unauthorized, AuthenticationErrorMessage)
+                    )
 
             | :? AuthorizationException as ex ->
                 logger.LogDebug(AuthorizationException.EventId, ex, ex.Message)
 
-                context.Response.StatusCode <- HttpStatusCode.Forbidden |> int
+                context.Response.StatusCode <- StatusCodes.Status403Forbidden
 
-                return! context.Response.WriteAsJsonAsync({| message = AuthorizationErrorMessage |})
-
-            | :? DataAccessException as ex ->
-                logger.LogError(DataAccessException.EventId, ex, ex.Message)
-
-                context.Response.StatusCode <- HttpStatusCode.InternalServerError |> int
-
-                return! context.Response.WriteAsJsonAsync({| message = ServerErrorMessage |})
+                return!
+                    context.Response.WriteAsJsonAsync(
+                        ApiMessageResponse.Create(StatusCodes.Status403Forbidden, AuthorizationErrorMessage)
+                    )
 
             | ex ->
                 logger.LogError(ServerException.EventId, ex, ex.Message)
 
-                context.Response.StatusCode <- HttpStatusCode.InternalServerError |> int
+                context.Response.StatusCode <- StatusCodes.Status500InternalServerError
 
-                return! context.Response.WriteAsJsonAsync({| message = ServerErrorMessage |})
+                return!
+                    context.Response.WriteAsJsonAsync(
+                        ApiMessageResponse.Create(StatusCodes.Status500InternalServerError, ServerErrorMessage)
+                    )
         }

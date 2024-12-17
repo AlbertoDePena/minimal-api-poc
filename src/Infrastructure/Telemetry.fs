@@ -1,39 +1,27 @@
 namespace WebApp.Infrastructure.Telemetry
 
-open Microsoft.ApplicationInsights.Extensibility
-open Microsoft
-open Microsoft.AspNetCore.Http
+open System
+open System.Diagnostics
+open System.Diagnostics.Metrics
 
-open System.Reflection
+type Telemetry() =
 
-type Application() =
-    static member Name = "htmx-poc"
+    let activitySource =
+        new ActivitySource(Telemetry.ApplicationName, Telemetry.Version)
 
-    static member Version =
-        Assembly
-            .GetAssembly(typeof<Application>)
-            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-            .InformationalVersion
+    let meter = new Meter(Telemetry.ApplicationName, Telemetry.Version)
 
-type CloudRoleNameInitializer() =
+    member this.ActivitySource = activitySource
 
-    interface ITelemetryInitializer with
-        member this.Initialize(telemetry: ApplicationInsights.Channel.ITelemetry) =
-            telemetry.Context.Cloud.RoleName <- Application.Name
+    member this.Meter = meter
 
-type ComponentVersionInitializer() =
+    static member ApplicationName = "MinimalApi.WebApp"
 
-    interface ITelemetryInitializer with
-        member this.Initialize(telemetry: ApplicationInsights.Channel.ITelemetry) =
-            telemetry.Context.Component.Version <- Application.Version
+    static member Version = typeof<Telemetry>.Assembly.GetName().Version.ToString()
 
-type AuthenticatedUserInitializer(httpContextAccessor: IHttpContextAccessor) =
+    interface IDisposable with
 
-    interface ITelemetryInitializer with
-        member this.Initialize(telemetry: ApplicationInsights.Channel.ITelemetry) =
-            if
-                httpContextAccessor.HttpContext <> null
-                && httpContextAccessor.HttpContext.User <> null
-                && httpContextAccessor.HttpContext.User.Identity.IsAuthenticated
-            then
-                telemetry.Context.User.AuthenticatedUserId <- httpContextAccessor.HttpContext.User.Identity.Name
+        member this.Dispose() =
+            activitySource.Dispose()
+            meter.Dispose()
+

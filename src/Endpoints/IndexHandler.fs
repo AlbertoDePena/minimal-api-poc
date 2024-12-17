@@ -20,9 +20,9 @@ module IndexHandler =
     let handle: EndpointHandler =
         handleEndpoint (fun httpContext ->
             task {
-                let correlationId = Guid.NewGuid() |> fun guid -> guid.ToString()
-
                 let logger = httpContext.GetLogger LoggerCategoryName
+
+                let correlationId = Guid.NewGuid() |> fun guid -> guid.ToString()
 
                 logger.LogInformation("Requesting index view: CorrelationID {CorrelationId}", correlationId)
 
