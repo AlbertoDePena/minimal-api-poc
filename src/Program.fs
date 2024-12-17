@@ -15,6 +15,8 @@ open Microsoft.Extensions.Configuration
 open Azure.Monitor.OpenTelemetry.AspNetCore
 
 open OpenTelemetry
+open OpenTelemetry.Logs
+open OpenTelemetry.Metrics
 open OpenTelemetry.Trace
 open OpenTelemetry.Resources
 
@@ -72,12 +74,7 @@ module Program =
             builder.Services.AddAuthorization() |> ignore
             builder.Services.AddAntiforgery() |> ignore
 
-            let openTelemetryBuilder =
-                if isDevelopment
-                then
-                    builder.Services.AddOpenTelemetry()
-                else
-                    builder.Services.AddOpenTelemetry().UseAzureMonitor()
+            let openTelemetryBuilder = builder.Services.AddOpenTelemetry()
 
             openTelemetryBuilder
                 .ConfigureResource(fun resourceBuilder ->
@@ -86,14 +83,40 @@ module Program =
                         serviceVersion = Telemetry.Version,
                         serviceInstanceId = Environment.MachineName
                     )
-                    |> ignore)
-                .WithMetrics(fun meterBuilder -> meterBuilder.AddMeter(Telemetry.ApplicationName) |> ignore)
+                    |> ignore)      
+                .WithLogging(fun loggerBuilder ->                         
+                    if isDevelopment then
+                        loggerBuilder.AddConsoleExporter() |> ignore)
+                .WithMetrics(fun meterBuilder ->
+                    meterBuilder.AddAspNetCoreInstrumentation() |> ignore
+                    meterBuilder.AddMeter("Microsoft.AspNetCore.Hosting") |> ignore
+                    meterBuilder.AddMeter("Microsoft.AspNetCore.Server.Kestrel") |> ignore
+                    meterBuilder.AddMeter(Telemetry.ApplicationName) |> ignore
+
+                    if isDevelopment then
+                        meterBuilder.AddConsoleExporter() |> ignore)
                 .WithTracing(fun tracerBuilder ->
+                    tracerBuilder.AddAspNetCoreInstrumentation() |> ignore
+                    tracerBuilder.AddHttpClientInstrumentation() |> ignore
                     tracerBuilder.AddSource(Telemetry.ApplicationName) |> ignore
 
                     if isDevelopment then
                         tracerBuilder.AddConsoleExporter() |> ignore)
             |> ignore
+
+            if
+                builder.Configuration.GetValue<string> "OTEL_EXPORTER_OTLP_ENDPOINT"
+                |> String.IsNullOrWhiteSpace
+                |> not
+            then
+                openTelemetryBuilder.UseOtlpExporter() |> ignore
+
+            if
+                builder.Configuration.GetValue<string> "APPLICATIONINSIGHTS_CONNECTION_STRING"
+                |> String.IsNullOrWhiteSpace
+                |> not
+            then
+                openTelemetryBuilder.UseAzureMonitor() |> ignore
 
             builder.Services
                 .AddHealthChecks()
