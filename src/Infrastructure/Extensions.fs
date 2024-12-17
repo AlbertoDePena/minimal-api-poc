@@ -1,4 +1,4 @@
-namespace WebApp.Extensions
+namespace WebApp.Infrastructure.Extensions
 
 open System
 open System.Text
@@ -58,3 +58,9 @@ module ResultsExtensions =
 
         static member Html(content: string) : IResult =
             Results.Content(content, "text/html; charset=utf-8", Encoding.UTF8)
+
+[<RequireQualifiedAccess>]
+module String =
+
+    /// The default value of a string is null.
+    let defaultValue = null

@@ -19,11 +19,11 @@ open Microsoft.Identity.Web
 
 open Serilog
 
-open WebApp.Telemetry
-open WebApp.Serilog
-open WebApp.Dapper
-open WebApp.Options
-open WebApp.ErrorHandlerMiddleware
+open WebApp.Infrastructure.Telemetry
+open WebApp.Infrastructure.Serilog
+open WebApp.Infrastructure.Dapper
+open WebApp.Infrastructure.Options
+open WebApp.Infrastructure.ErrorHandlerMiddleware
 open WebApp.Endpoints
 
 [<RequireQualifiedAccess>]

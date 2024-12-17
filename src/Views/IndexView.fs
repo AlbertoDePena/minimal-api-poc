@@ -1,14 +1,13 @@
-namespace WebApp.Views
+namespace WebApp.Views.IndexView
 
 open System
 
+type IndexViewModel = { Message: string }
+
 [<RequireQualifiedAccess>]
-module Index =
-    open WebApp.Views.Html
+module IndexView =
 
-    type Model = { Message: string }
-
-    let render (model: Model) =
+    let render (model: IndexViewModel) =
 
         let template =
             $"""

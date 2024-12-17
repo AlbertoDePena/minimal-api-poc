@@ -1,11 +1,5 @@
 namespace WebApp.Invariants
 
-[<RequireQualifiedAccess>]
-module String =
-
-    /// The default value of a string is null.
-    let defaultValue = null
-
 /// <summary>
 /// Represents a non null/empty/white-space email address
 /// </summary>
@@ -52,3 +46,4 @@ module Alias =
     type Money = Decimal
     type Number = Int32
     type UniqueId = Guid
+    type Timestamp = DateTimeOffset

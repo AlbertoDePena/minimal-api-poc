@@ -1,7 +1,7 @@
 namespace WebApp.Endpoints
 
 open System
-open WebApp.Extensions
+open WebApp.Infrastructure.Extensions
 open WebApp.Invariants
 open Microsoft.Extensions.Logging
 open Microsoft.AspNetCore.Http

@@ -1,4 +1,4 @@
-namespace WebApp.Database
+namespace WebApp.Infrastructure.Sql
 
 [<RequireQualifiedAccess>]
 module DbConnection =

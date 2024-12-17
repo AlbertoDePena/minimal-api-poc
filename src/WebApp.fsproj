@@ -9,15 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>    
-    <Compile Include="Invariants.fs" />
-	<Compile Include="Extensions.fs" />	
-	<Compile Include="Exceptions.fs" />
-	<Compile Include="Options.fs" />
-	<Compile Include="ErrorHandlerMiddleware.fs" />
-	<Compile Include="Database.fs" />
-	<Compile Include="Dapper.fs" />
-	<Compile Include="Telemetry.fs" />
-	<Compile Include="Serilog.fs" />	
+    <Compile Include="Invariants.fs" />	
+	<Compile Include="Infrastructure\Extensions.fs" />
+    <Compile Include="Infrastructure\Exceptions.fs" />
+    <Compile Include="Infrastructure\Options.fs" />
+    <Compile Include="Infrastructure\ErrorHandlerMiddleware.fs" />
+    <Compile Include="Infrastructure\Sql.fs" />
+    <Compile Include="Infrastructure\Dapper.fs" />
+    <Compile Include="Infrastructure\Telemetry.fs" />
+    <Compile Include="Infrastructure\Serilog.fs" />
 	<Compile Include="Views/Html.fs" />
 	<Compile Include="Views/IndexView.fs" />	
 	<Compile Include="Endpoints/Endpoint.fs" />
@@ -26,19 +26,19 @@
   </ItemGroup>
 
   <ItemGroup>
-		<PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.0" />
-		<PackageReference Include="Dapper" Version="2.0.123" />
-		<PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.15.1" />
+		<PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="8.0.2" />
+		<PackageReference Include="Dapper" Version="2.1.35" />
+		<PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.18.0" />
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />		
-		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.5" />		
-		<PackageReference Include="Microsoft.Identity.Web" Version="2.17.0" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />		
+		<PackageReference Include="Microsoft.Identity.Web" Version="3.5.0" />
 		<PackageReference Include="RT.Comb" Version="4.0.1" />
-		<PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
-		<PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" />
+		<PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+		<PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
 		<PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="4.0.0" />		
 	</ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup>   
     <Folder Include="wwwroot\" />
   </ItemGroup>
 

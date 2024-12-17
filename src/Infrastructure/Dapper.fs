@@ -1,9 +1,10 @@
-namespace WebApp.Dapper
+namespace WebApp.Infrastructure.Dapper
 
 open System
 open Dapper
 
 open WebApp.Invariants
+open WebApp.Infrastructure.Extensions
 
 [<RequireQualifiedAccess>]
 module Dapper =
@@ -27,9 +28,25 @@ module Dapper =
             param.Value <-
                 (match value with
                  | Some t -> getValue t
-                 | None -> null)
+                 | None -> String.defaultValue)
 
         override _.Parse value = value :?> string |> ofString
+
+    type private EmptyStringHandler() =
+        inherit SqlMapper.TypeHandler<string>()
+
+        override _.SetValue(param, value) =
+            param.Value <-
+                (if String.IsNullOrWhiteSpace value then
+                     String.defaultValue
+                 else
+                     value)
+
+        override _.Parse value =
+            if isNull value || value = box DBNull.Value then
+                String.defaultValue
+            else
+                value.ToString()
 
     type private OptionHandler<'T>() =
         inherit SqlMapper.TypeHandler<option<'T>>()
@@ -38,7 +55,7 @@ module Dapper =
             let valueOrNull =
                 match value with
                 | Some t -> box t
-                | None -> null
+                | None -> String.defaultValue
 
             param.Value <- valueOrNull
 
@@ -70,6 +87,7 @@ module Dapper =
              SqlMapper.AddTypeHandler(OptionHandler<DateOnly>())
              SqlMapper.AddTypeHandler(OptionHandler<bool>())
              SqlMapper.AddTypeHandler(OptionHandler<TimeSpan>())
+             SqlMapper.AddTypeHandler(EmptyStringHandler())
              // string wrapped in a container
              SqlMapper.AddTypeHandler(StringContainerHandler(Text.OfString, (fun x -> x.ToString())))
              SqlMapper.AddTypeHandler(StringContainerHandler(EmailAddress.OfString, (fun x -> x.ToString())))

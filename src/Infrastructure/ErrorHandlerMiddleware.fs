@@ -1,10 +1,10 @@
-namespace WebApp.ErrorHandlerMiddleware
+namespace WebApp.Infrastructure.ErrorHandlerMiddleware
 
 open System.Net
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Logging
 
-open WebApp.Exceptions
+open WebApp.Infrastructure.Exceptions
 
 type ErrorHandlerMiddleware(next: RequestDelegate, logger: ILogger<ErrorHandlerMiddleware>) =
 
