@@ -1,17 +1,20 @@
 namespace WebApp.Domain.Invariants
 
 /// <summary>
-/// Represents a non null/empty/white-space email address
+/// Represents a non-null email address
 /// </summary>
 type EmailAddress =
     private
     | EmailAddress of string
 
-    override this.ToString() =
+    /// <summary>Gets the value of the email address.</summary>
+    member this.Value =
         let (EmailAddress value) = this
         value
 
-    /// <summary>Try to convert a potentially null/empty/white-space string to an EmailAddress</summary>
+    override this.ToString() = this.Value
+
+    /// <summary>Try to convert a potentially null/empty/white-space string to an EmailAddress.</summary>
     static member OfString(value: string) =
         if System.String.IsNullOrWhiteSpace value then
             None
@@ -21,22 +24,28 @@ type EmailAddress =
             None
 
 /// <summary>
-/// Represents a non null/empty/white-space string
+/// Represents a non-null string.
 /// </summary>
-type Text =
+type NonNullString =
     private
-    | Text of string
+    | NonNullString of string
 
-    override this.ToString() =
-        let (Text value) = this
+    /// <summary>Gets the value of the non-null string.</summary>
+    member this.Value =
+        let (NonNullString value) = this
         value
 
-    /// <summary>Try to convert a potentially null/empty/white-space string to a Text</summary>
-    static member OfString(value: string) =
+    override this.ToString() = this.Value
+
+    /// <summary>The default value of a non-null string is the empty string.</summary>
+    static member DefaultValue = NonNullString ""
+
+    /// <summary>Creates a non-null string from the given value.</summary>
+    static member Create(value: string) =
         if System.String.IsNullOrWhiteSpace value then
-            None
+            NonNullString.DefaultValue
         else
-            Some(Text value)
+            NonNullString value
 
 [<AutoOpen>]
 module Alias =
@@ -46,4 +55,5 @@ module Alias =
     type Money = Decimal
     type Number = Int32
     type UniqueId = Guid
+    type Text = NonNullString
     type Timestamp = DateTimeOffset

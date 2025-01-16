@@ -48,6 +48,22 @@ module Dapper =
             else
                 value.ToString()
 
+    type private NonNullStringHandler() =
+        inherit SqlMapper.TypeHandler<NonNullString>()
+
+        override _.SetValue(param, value) =
+            param.Value <-
+                (if String.IsNullOrWhiteSpace value.Value then
+                     String.defaultValue
+                 else
+                     value.Value)
+
+        override _.Parse value =
+            if isNull value || value = box DBNull.Value then
+                NonNullString.DefaultValue
+            else
+                value.ToString() |> NonNullString.Create
+
     type private OptionHandler<'T>() =
         inherit SqlMapper.TypeHandler<option<'T>>()
 
@@ -88,11 +104,10 @@ module Dapper =
              SqlMapper.AddTypeHandler(OptionHandler<bool>())
              SqlMapper.AddTypeHandler(OptionHandler<TimeSpan>())
              SqlMapper.AddTypeHandler(EmptyStringHandler())
+             SqlMapper.AddTypeHandler(NonNullStringHandler())
              // string wrapped in a container
-             SqlMapper.AddTypeHandler(StringContainerHandler(Text.OfString, (fun x -> x.ToString())))
              SqlMapper.AddTypeHandler(StringContainerHandler(EmailAddress.OfString, (fun x -> x.ToString())))
              // string wrapped in an optional container
-             SqlMapper.AddTypeHandler(StringContainerOptionHandler(Text.OfString, (fun x -> x.ToString())))
              SqlMapper.AddTypeHandler(StringContainerOptionHandler(EmailAddress.OfString, (fun x -> x.ToString()))))
 
     /// Register Dapper type handlers
