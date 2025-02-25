@@ -49,8 +49,6 @@ module Program =
 
             let builder = WebApplication.CreateBuilder(args)
 
-            let isDevelopment = builder.Environment.IsDevelopment()
-
             builder.Services
                 .AddOptions<DatabaseOptions>()
                 .Configure<IConfiguration>(fun settings configuration ->
@@ -90,23 +88,15 @@ module Program =
                         serviceInstanceId = Environment.MachineName
                     )
                     |> ignore)
-                .WithLogging(fun loggerBuilder ->
-                    if isDevelopment then
-                        loggerBuilder.AddConsoleExporter() |> ignore)
+                .WithLogging()
                 .WithMetrics(fun meterBuilder ->
                     meterBuilder.AddAspNetCoreInstrumentation() |> ignore
                     meterBuilder.AddHttpClientInstrumentation() |> ignore
-                    meterBuilder.AddMeter(Telemetry.ApplicationName) |> ignore
-
-                    if isDevelopment then
-                        meterBuilder.AddConsoleExporter() |> ignore)
+                    meterBuilder.AddMeter(Telemetry.ApplicationName) |> ignore)
                 .WithTracing(fun tracerBuilder ->
                     tracerBuilder.AddAspNetCoreInstrumentation() |> ignore
                     tracerBuilder.AddHttpClientInstrumentation() |> ignore
-                    tracerBuilder.AddSource(Telemetry.ApplicationName) |> ignore
-
-                    if isDevelopment then
-                        tracerBuilder.AddConsoleExporter() |> ignore)
+                    tracerBuilder.AddSource(Telemetry.ApplicationName) |> ignore)
             |> ignore
 
             if

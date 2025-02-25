@@ -43,7 +43,7 @@ module LayoutView =
                     <div class="loader"></div>
                 </div>
 
-                <script src="https://unpkg.com/htmx.org@1.9.11"></script>
+                <script src="https://unpkg.com/htmx.org@2.0.3"></script>
                 <script src="/js/main.js"></script>
             </body>
             </html>
