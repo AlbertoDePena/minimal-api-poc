@@ -40,6 +40,29 @@ type Text =
         else
             Some(Text value)
 
+/// <summary>
+/// Represents a guid that is not empty.
+/// </summary>
+type UniqueId =
+    private
+    | UniqueId of System.Guid
+
+    member this.Value =
+        let (UniqueId value) = this
+        value
+
+    override this.ToString() =
+        this.Value |> fun guid -> guid.ToString()
+
+    static member TryCreate(value: System.Guid) =
+        if value = System.Guid.Empty then
+            None
+        else
+            Some(UniqueId value)
+
+    static member Create() =
+        RT.Comb.Provider.Sql.Create() |> UniqueId
+
 [<AutoOpen>]
 module Alias =
     open System
@@ -47,5 +70,4 @@ module Alias =
     type BigNumber = Int64
     type Money = Decimal
     type Number = Int32
-    type UniqueId = Guid
     type Timestamp = DateTimeOffset

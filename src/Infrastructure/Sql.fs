@@ -13,10 +13,3 @@ module DbConnection =
             invalidArg "dbConnectionString" "Database connection string cannot be null/empty/white-space"
         else
             new SqlConnection(connectionString) :> IDbConnection
-
-[<RequireQualifiedAccess>]
-module UniqueId =
-    open System
-    open RT.Comb
-
-    let create () : Guid = Provider.Sql.Create()
