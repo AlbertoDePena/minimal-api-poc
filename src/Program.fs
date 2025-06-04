@@ -1,7 +1,6 @@
 namespace WebApp.Program
 
 open System
-open System.Threading
 
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Authentication.OpenIdConnect
@@ -15,8 +14,6 @@ open Microsoft.Extensions.Configuration
 open Azure.Monitor.OpenTelemetry.AspNetCore
 
 open OpenTelemetry
-open OpenTelemetry.Exporter
-open OpenTelemetry.Logs
 open OpenTelemetry.Metrics
 open OpenTelemetry.Trace
 open OpenTelemetry.Resources
@@ -27,6 +24,7 @@ open Microsoft.Identity.Web
 open WebApp.Infrastructure.Telemetry
 open WebApp.Infrastructure.Dapper
 open WebApp.Infrastructure.Options
+open WebApp.Infrastructure.UserDatabase
 open WebApp.Infrastructure.ErrorHandlerMiddleware
 open WebApp.Endpoints
 open Microsoft.AspNetCore.Diagnostics.HealthChecks
@@ -47,12 +45,12 @@ module Program =
         try
             Dapper.registerTypeHandlers ()
 
-            let builder = WebApplication.CreateBuilder(args)
+            let builder = WebApplication.CreateBuilder args
 
             builder.Services
                 .AddOptions<DatabaseOptions>()
                 .Configure<IConfiguration>(fun settings configuration ->
-                    configuration.GetSection("Database").Bind(settings))
+                    configuration.GetSection("Database").Bind settings)
             |> ignore
 
             builder.Services.Configure<CookiePolicyOptions>(
@@ -60,7 +58,7 @@ module Program =
                     options.Secure <- CookieSecurePolicy.Always
                     options.HttpOnly <- HttpOnlyPolicy.Always
                     options.MinimumSameSitePolicy <- SameSiteMode.Lax
-                    options.CheckConsentNeeded <- (fun context -> true)
+                    options.CheckConsentNeeded <- fun context -> true
                     options.HandleSameSiteCookieCompatibility() |> ignore)
             )
             |> ignore
@@ -70,6 +68,7 @@ module Program =
                 .AddMicrosoftIdentityWebApp(fun options -> builder.Configuration.Bind("AzureAd", options))
             |> ignore
 
+            builder.Services.AddSingleton<UserDatabase>() |> ignore
             builder.Services.AddSingleton<Telemetry>() |> ignore
             builder.Services.AddAuthorization() |> ignore
             builder.Services.AddAntiforgery() |> ignore
@@ -92,11 +91,11 @@ module Program =
                 .WithMetrics(fun meterBuilder ->
                     meterBuilder.AddAspNetCoreInstrumentation() |> ignore
                     meterBuilder.AddHttpClientInstrumentation() |> ignore
-                    meterBuilder.AddMeter(Telemetry.ApplicationName) |> ignore)
+                    meterBuilder.AddMeter Telemetry.ApplicationName |> ignore)
                 .WithTracing(fun tracerBuilder ->
                     tracerBuilder.AddAspNetCoreInstrumentation() |> ignore
                     tracerBuilder.AddHttpClientInstrumentation() |> ignore
-                    tracerBuilder.AddSource(Telemetry.ApplicationName) |> ignore)
+                    tracerBuilder.AddSource Telemetry.ApplicationName |> ignore)
             |> ignore
 
             if
@@ -118,7 +117,7 @@ module Program =
                 .AddSqlServer(
                     connectionStringFactory =
                         (fun services ->
-                            services.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString),
+                            services.GetRequiredService<IOptions<DatabaseOptions>>().Value.SqlConnectionString),
                     name = "HTMX POC Database"
                 )
             |> ignore
@@ -143,13 +142,13 @@ module Program =
                 "/api/Health",
                 HealthCheckOptions(
                     ResponseWriter =
-                        (fun httpContext healthReport ->
+                        fun httpContext healthReport ->
                             task {
                                 if healthReport.Status = HealthStatus.Unhealthy then
                                     return Results.StatusCode(statusCode = StatusCodes.Status503ServiceUnavailable)
                                 else
                                     return Results.Ok()
-                            })
+                            }
                 )
             )
             |> ignore
@@ -158,18 +157,18 @@ module Program =
                 "/api/HealthReport",
                 HealthCheckOptions(
                     ResponseWriter =
-                        (fun httpContext healthReport ->
-                            UIResponseWriter.WriteHealthCheckUIResponse(httpContext, healthReport))
+                        fun httpContext healthReport ->
+                            UIResponseWriter.WriteHealthCheckUIResponse(httpContext, healthReport)
                 )
             )
             |> ignore
 
-            app.MapGet("/", IndexHandler.handle).RequireAuthorization() |> ignore
+            app.MapGet("/", IndexHandler.renderPage).RequireAuthorization() |> ignore
 
             app.Run()
 
             SuccessExitCode
         with ex ->
-            Console.Error.WriteLine(ex)
+            Console.Error.WriteLine ex
 
             FailureExitCode

@@ -51,7 +51,7 @@ module HttpRequestExtensions =
 
         member this.TryGetBearerToken() : string option =
             this.TryGetHeaderValue "Authorization"
-            |> Option.filter (fun value -> value.Contains("Bearer "))
+            |> Option.filter (fun value -> value.Contains "Bearer ")
             |> Option.map (fun value -> value.Substring("Bearer ".Length).Trim())
 
         /// Determines if the current HTTP Request was invoked by HTMX on the client.

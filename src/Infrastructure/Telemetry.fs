@@ -4,6 +4,15 @@ open System
 open System.Diagnostics
 open System.Diagnostics.Metrics
 
+[<RequireQualifiedAccess>]
+module TelemetryKey =
+    
+    [<Literal>]
+    let AppCorrelationId = "app.correlation_id"
+
+    [<Literal>]
+    let AppUserName = "app.user_name"
+
 type Telemetry() =
 
     let activitySource =
@@ -14,6 +23,8 @@ type Telemetry() =
     member this.ActivitySource = activitySource
 
     member this.Meter = meter
+
+    member this.CreateCorrelationId() = Guid.NewGuid() |> fun guid -> guid.ToString()
 
     static member ApplicationName = "MinimalApi.WebApp"
 

@@ -1,4 +1,4 @@
-namespace WebApp.Domain.Invariants
+namespace WebApp.Domain.Shared
 
 /// <summary>
 /// Represents a valid email address

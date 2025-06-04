@@ -5,21 +5,24 @@
 		<WarnOn>3395;$(WarnOn)</WarnOn>
 		<WarningLevel>5</WarningLevel>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<UserSecretsId>6a30aff6-7074-4502-9520-3569c7dbf275</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="Domain\Invariants.fs" />
+		<Compile Include="Dtos\UserDto.fs" />
+		<Compile Include="Domain\Shared.fs" />
+		<Compile Include="Domain\User.fs" />
 		<Compile Include="Infrastructure\ApiMessageResponse.fs" />
 		<Compile Include="Infrastructure\Extensions.fs" />
 		<Compile Include="Infrastructure\Exceptions.fs" />
 		<Compile Include="Infrastructure\Options.fs" />
 		<Compile Include="Infrastructure\ErrorHandlerMiddleware.fs" />
-		<Compile Include="Infrastructure\Sql.fs" />
+		<Compile Include="Infrastructure\SqlDatabase.fs" />
+		<Compile Include="Infrastructure\UserDatabase.fs" />
 		<Compile Include="Infrastructure\Dapper.fs" />
 		<Compile Include="Infrastructure\Telemetry.fs" />
 		<Compile Include="Views\Html.fs" />
 		<Compile Include="Views\LayoutView.fs" />
+		<Compile Include="Views\UserPageView.fs" />
 		<Compile Include="Endpoints\Endpoint.fs" />
 		<Compile Include="Endpoints\IndexHandler.fs" />
 		<Compile Include="Program.fs" />
@@ -38,7 +41,8 @@
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="8.0.8" />
-		<PackageReference Include="Microsoft.Identity.Web" Version="3.2.0" />
+		<PackageReference Include="Microsoft.Identity.Web" Version="3.9.3" />
+		<PackageReference Include="OpenTelemetry.Api" Version="1.12.0" />
 		<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.9.0" />
 		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.9.0" />
 		<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />

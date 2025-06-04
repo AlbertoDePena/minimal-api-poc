@@ -3,7 +3,8 @@ namespace WebApp.Infrastructure.Dapper
 open System
 open Dapper
 
-open WebApp.Domain.Invariants
+open WebApp.Domain.Shared
+open WebApp.Domain.User
 open WebApp.Infrastructure.Extensions
 
 [<RequireQualifiedAccess>]
@@ -26,9 +27,9 @@ module Dapper =
 
         override _.SetValue(param, value) =
             param.Value <-
-                (match value with
-                 | Some t -> getValue t
-                 | None -> String.defaultValue)
+                match value with
+                | Some t -> getValue t
+                | None -> String.defaultValue
 
         override _.Parse value = value :?> string |> ofString
 
@@ -37,10 +38,10 @@ module Dapper =
 
         override _.SetValue(param, value) =
             param.Value <-
-                (if String.IsNullOrWhiteSpace value then
-                     String.defaultValue
-                 else
-                     value)
+                if String.IsNullOrWhiteSpace value then
+                    String.defaultValue
+                else
+                    value
 
         override _.Parse value =
             if isNull value || value = box DBNull.Value then
@@ -68,6 +69,7 @@ module Dapper =
     let private singleton =
         lazy
             (
+             SqlMapper.AddTypeHandler(EmptyStringHandler())
              // primitive type wrapped in an option
              SqlMapper.AddTypeHandler(OptionHandler<Guid>())
              SqlMapper.AddTypeHandler(OptionHandler<byte>())
@@ -86,14 +88,15 @@ module Dapper =
              SqlMapper.AddTypeHandler(OptionHandler<DateTimeOffset>())
              SqlMapper.AddTypeHandler(OptionHandler<DateOnly>())
              SqlMapper.AddTypeHandler(OptionHandler<bool>())
-             SqlMapper.AddTypeHandler(OptionHandler<TimeSpan>())
-             SqlMapper.AddTypeHandler(EmptyStringHandler())
+             SqlMapper.AddTypeHandler(OptionHandler<TimeSpan>())             
              // string wrapped in a container
              SqlMapper.AddTypeHandler(StringContainerHandler(EmailAddress.TryCreate, (fun x -> x.Value)))
              SqlMapper.AddTypeHandler(StringContainerHandler(Text.TryCreate, (fun x -> x.Value)))
+             SqlMapper.AddTypeHandler(StringContainerHandler(UserType.TryCreate, (fun x -> x.Value)))
              // string wrapped in an optional container
              SqlMapper.AddTypeHandler(StringContainerOptionHandler(EmailAddress.TryCreate, (fun x -> x.Value)))
-             SqlMapper.AddTypeHandler(StringContainerOptionHandler(Text.TryCreate, (fun x -> x.Value))))
+             SqlMapper.AddTypeHandler(StringContainerOptionHandler(Text.TryCreate, (fun x -> x.Value)))
+             SqlMapper.AddTypeHandler(StringContainerOptionHandler(UserType.TryCreate, (fun x -> x.Value))))
 
     /// Register Dapper type handlers
     let registerTypeHandlers () = singleton.Force()

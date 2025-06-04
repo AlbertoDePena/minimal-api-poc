@@ -1,4 +1,4 @@
 namespace WebApp.Infrastructure.Options
 
 [<CLIMutable>]
-type DatabaseOptions = { ConnectionString: string }
+type DatabaseOptions = { SqlConnectionString: string }

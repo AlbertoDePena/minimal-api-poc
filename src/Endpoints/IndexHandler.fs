@@ -2,36 +2,36 @@ namespace WebApp.Endpoints
 
 open System
 open WebApp.Infrastructure.Extensions
-open WebApp.Domain.Invariants
 open WebApp.Infrastructure.Telemetry
 open Microsoft.Extensions.Logging
 open Microsoft.AspNetCore.Http
+open WebApp.Views.UserPageView
 
 [<RequireQualifiedAccess>]
 module IndexHandler =
 
     [<Literal>]
-    let LoggerCategoryName = "Index"
+    let LoggerCategoryName = "IndexPage"
 
-    type Model =
-        { Name: string
-          Items: string list
-          Description: Text }
-
-    let handle: EndpointHandler =
+    let renderPage: EndpointHandler =
         handleEndpoint (fun httpContext ->
             task {
                 let logger = httpContext.GetLogger LoggerCategoryName
                 let telemetry = httpContext.GetService<Telemetry>()
+                let correlationId = telemetry.CreateCorrelationId()
 
-                use activity = telemetry.ActivitySource.StartActivity "IndexHandler"
-
-                let correlationId = Guid.NewGuid() |> fun guid -> guid.ToString()
+                use activity = telemetry.ActivitySource.StartActivity LoggerCategoryName
 
                 if activity |> isNull |> not then
-                    activity.AddTag("app.correlation_id", correlationId) |> ignore
+                    activity
+                        .AddTag(TelemetryKey.AppCorrelationId, correlationId)
+                        .AddTag(TelemetryKey.AppUserName, httpContext.User.Identity.Name)
+                    |> ignore
 
                 logger.LogInformation("Requesting index view: CorrelationID {CorrelationId}", correlationId)
 
-                return Results.Html "Hello World!"
+                return
+                    httpContext.User.Identity.Name
+                    |> UserPageView.render "Hello World!"
+                    |> Results.Html
             })

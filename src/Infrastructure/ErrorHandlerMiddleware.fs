@@ -2,7 +2,6 @@ namespace WebApp.Infrastructure.ErrorHandlerMiddleware
 
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Logging
-
 open WebApp.Infrastructure.Exceptions
 open WebApp.Infrastructure.ApiMessageResponse
 

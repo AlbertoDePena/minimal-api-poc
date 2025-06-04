@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
             Swal.fire({
                 scrollbarPadding: false,
                 title: "An unhandled error occurred",
-                text: event.detail.xhr.response
+                text: event.detail.xhr.response                
             });
         }
     });

@@ -6,7 +6,7 @@ open System.Net
 
 [<RequireQualifiedAccess>]
 module Html =
-    
+
     let disabled (value: bool) : string =
         match value with
         | true -> "disabled"
@@ -47,5 +47,3 @@ module Html =
 
     let formatDateTimeOffset (dateTimeOffset: DateTimeOffset) : string =
         dateTimeOffset.ToString("o", CultureInfo.InvariantCulture)
-
-    

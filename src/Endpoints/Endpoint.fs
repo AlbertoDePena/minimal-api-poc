@@ -10,4 +10,4 @@ module Endpoint =
     type EndpointHandler = Func<HttpContext, Task<IResult>>
 
     let handleEndpoint (handler: HttpContext -> Task<IResult>) : EndpointHandler =
-        Func<HttpContext, Task<IResult>>(handler)
+        Func<HttpContext, Task<IResult>> handler
