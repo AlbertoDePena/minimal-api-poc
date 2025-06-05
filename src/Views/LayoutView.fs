@@ -44,7 +44,8 @@ module LayoutView =
                     <div class="loader"></div>
                 </div>
 
-                <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+                <script src="/js/htmx.2.0.4.js"></script>
+                <script src="/js/sweetalert2.11.17.2.js"></script>
                 <script src="/js/main.js"></script>
             </body>
             </html>

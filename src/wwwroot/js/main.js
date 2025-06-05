@@ -9,8 +9,36 @@ document.addEventListener('DOMContentLoaded', function () {
             Swal.fire({
                 scrollbarPadding: false,
                 title: "An unhandled error occurred",
-                text: event.detail.xhr.response                
+                text: event.detail.xhr.response,
+                customClass: {
+                    confirmButton: 'button is-small is-primary',
+                    denyButton: 'button is-small is-danger',
+                    cancelButton: 'button is-small'
+                } 
             });
         }
     });
 });
+
+function cookieForbidden() {
+    Swal.fire({
+        scrollbarPadding: false,
+        title: 'Access not allowed',
+        customClass: {
+            confirmButton: 'button is-small is-primary',
+            denyButton: 'button is-small is-danger',
+            cancelButton: 'button is-small'
+        }
+    });
+}
+
+function showToast() {
+    Swal.fire({
+        scrollbarPadding: false,
+        title: "Configuration/s updated",
+        toast: true,
+        position: 'bottom-end',
+        timer: 5000,
+        showConfirmButton: false
+    });
+}
