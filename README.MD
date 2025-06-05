@@ -2,14 +2,9 @@
 
 ## Environment Variables
 
-* Use `:` in `dotnet user-secrets`
-* Use `--` in Azure key vault
 
 ```
-Database:ConnectionString ""
-
-Application:DefaultLogLevel "Warning"
-Application:InfrastructureLogLevel "Warning"
+Database:SqlConnectionString ""
 
 AzureAd:Instance "https://login.microsoftonline.com/"
 AzureAd:Domain "<org>.onmicrosoft.com"
