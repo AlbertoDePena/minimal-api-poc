@@ -2,20 +2,11 @@ namespace WebApp.Infrastructure.ErrorHandlerMiddleware
 
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Logging
+open WebApp.Infrastructure.Constants
 open WebApp.Infrastructure.Exceptions
 open WebApp.Infrastructure.ApiMessageResponse
 
 type ErrorHandlerMiddleware(next: RequestDelegate, logger: ILogger<ErrorHandlerMiddleware>) =
-
-    [<Literal>]
-    let AuthenticationErrorMessage = "The request is not authenticated."
-
-    [<Literal>]
-    let AuthorizationErrorMessage = "The request is not allowed."
-
-    [<Literal>]
-    let ServerErrorMessage =
-        "Something really bad happened. Please contact the system administrator."
 
     member this.Invoke(context: HttpContext) =
         task {
@@ -29,7 +20,7 @@ type ErrorHandlerMiddleware(next: RequestDelegate, logger: ILogger<ErrorHandlerM
 
                 return!
                     context.Response.WriteAsJsonAsync(
-                        ApiMessageResponse.Create(StatusCodes.Status401Unauthorized, AuthenticationErrorMessage)
+                        ApiMessageResponse.Create(StatusCodes.Status401Unauthorized, Message.AuthenticationError)
                     )
 
             | :? AuthorizationException as ex ->
@@ -39,7 +30,7 @@ type ErrorHandlerMiddleware(next: RequestDelegate, logger: ILogger<ErrorHandlerM
 
                 return!
                     context.Response.WriteAsJsonAsync(
-                        ApiMessageResponse.Create(StatusCodes.Status403Forbidden, AuthorizationErrorMessage)
+                        ApiMessageResponse.Create(StatusCodes.Status403Forbidden, Message.AuthorizationError)
                     )
 
             | ex ->
@@ -49,6 +40,6 @@ type ErrorHandlerMiddleware(next: RequestDelegate, logger: ILogger<ErrorHandlerM
 
                 return!
                     context.Response.WriteAsJsonAsync(
-                        ApiMessageResponse.Create(StatusCodes.Status500InternalServerError, ServerErrorMessage)
+                        ApiMessageResponse.Create(StatusCodes.Status500InternalServerError, Message.ServerError)
                     )
         }

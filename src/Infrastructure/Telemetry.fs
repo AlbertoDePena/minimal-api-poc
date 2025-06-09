@@ -4,15 +4,6 @@ open System
 open System.Diagnostics
 open System.Diagnostics.Metrics
 
-[<RequireQualifiedAccess>]
-module TelemetryKey =
-    
-    [<Literal>]
-    let AppCorrelationId = "app.correlation_id"
-
-    [<Literal>]
-    let AppUserName = "app.user_name"
-
 type Telemetry() =
 
     let activitySource =

@@ -11,6 +11,7 @@
 		<Compile Include="Dtos\UserDto.fs" />
 		<Compile Include="Domain\Shared.fs" />
 		<Compile Include="Domain\User.fs" />
+		<Compile Include="Infrastructure\Constants.fs" />
 		<Compile Include="Infrastructure\ApiMessageResponse.fs" />
 		<Compile Include="Infrastructure\Extensions.fs" />
 		<Compile Include="Infrastructure\Exceptions.fs" />

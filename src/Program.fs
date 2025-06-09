@@ -1,6 +1,7 @@
 namespace WebApp.Program
 
 open System
+open System.Threading.Tasks
 
 open Microsoft.AspNetCore.Http
 open Microsoft.AspNetCore.Authentication.OpenIdConnect
@@ -27,9 +28,11 @@ open WebApp.Infrastructure.Options
 open WebApp.Infrastructure.UserDatabase
 open WebApp.Infrastructure.ErrorHandlerMiddleware
 open WebApp.Endpoints
+open WebApp.Infrastructure.Constants
 open Microsoft.AspNetCore.Diagnostics.HealthChecks
 open Microsoft.Extensions.Diagnostics.HealthChecks
 open HealthChecks.UI.Client
+open Microsoft.AspNetCore.HttpOverrides
 
 [<RequireQualifiedAccess>]
 module Program =
@@ -46,6 +49,9 @@ module Program =
             Dapper.registerTypeHandlers ()
 
             let builder = WebApplication.CreateBuilder args
+
+            builder.Configuration.AddJsonFile("appsettings.local.json", optional = true)
+            |> ignore
 
             builder.Services
                 .AddOptions<DatabaseOptions>()
@@ -66,6 +72,66 @@ module Program =
             builder.Services
                 .AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApp(fun options -> builder.Configuration.Bind("AzureAd", options))
+            |> ignore
+
+            builder.Services.Configure<OpenIdConnectOptions>(
+                OpenIdConnectDefaults.AuthenticationScheme,
+                fun (options: OpenIdConnectOptions) ->
+                    let events = OpenIdConnectEvents()
+
+                    events.OnRedirectToIdentityProvider <-
+                        (fun redirectContext ->
+                            redirectContext.ProtocolMessage.RedirectUri <-
+                                builder.Configuration.GetValue<string> "Application:RedirectUri"
+
+                            Task.CompletedTask)
+
+                    options.Events <- events
+                    options.AccessDeniedPath <- PathString("/Forbidden/")
+            )
+            |> ignore
+
+            builder.Services.AddAuthorization(fun options ->
+                options.AddPolicy(
+                    PolicyName.User,
+                    fun policy ->
+                        policy
+                            .RequireAuthenticatedUser()
+                            .RequireClaim(ClaimType.Role, RoleClaimValue.User)
+                        |> ignore
+                )
+
+                options.AddPolicy(
+                    PolicyName.AccountAdministrator,
+                    fun policy ->
+                        policy
+                            .RequireAuthenticatedUser()
+                            .RequireClaim(ClaimType.Role, RoleClaimValue.AccountAdministrator)
+                        |> ignore
+                )
+
+                options.AddPolicy(
+                    PolicyName.ConfigurationAdministrator,
+                    fun policy ->
+                        policy
+                            .RequireAuthenticatedUser()
+                            .RequireClaim(ClaimType.Role, RoleClaimValue.ConfigurationAdministrator)
+                        |> ignore
+                )
+
+                options.AddPolicy(
+                    PolicyName.All,
+                    fun policy ->
+                        policy
+                            .RequireAuthenticatedUser()
+                            .RequireClaim(
+                                ClaimType.Role,
+                                [| RoleClaimValue.User
+                                   RoleClaimValue.AccountAdministrator
+                                   RoleClaimValue.ConfigurationAdministrator |]
+                            )
+                        |> ignore
+                ))
             |> ignore
 
             builder.Services.AddSingleton<UserDatabase>() |> ignore
@@ -117,7 +183,9 @@ module Program =
                 .AddSqlServer(
                     connectionStringFactory =
                         (fun services ->
-                            services.GetRequiredService<IOptions<DatabaseOptions>>().Value.SqlConnectionString),
+                            services
+                                .GetRequiredService<IOptions<DatabaseOptions>>()
+                                .Value.SqlConnectionString),
                     name = "HTMX POC Database"
                 )
             |> ignore
@@ -159,6 +227,16 @@ module Program =
                     ResponseWriter =
                         fun httpContext healthReport ->
                             UIResponseWriter.WriteHealthCheckUIResponse(httpContext, healthReport)
+                )
+            )
+            |> ignore
+
+            app.UseForwardedHeaders(
+                ForwardedHeadersOptions(
+                    ForwardedHeaders =
+                        (ForwardedHeaders.XForwardedFor
+                         ||| ForwardedHeaders.XForwardedProto
+                         ||| ForwardedHeaders.XForwardedHost)
                 )
             )
             |> ignore

@@ -5,6 +5,7 @@ open WebApp.Infrastructure.Extensions
 open WebApp.Infrastructure.Telemetry
 open Microsoft.Extensions.Logging
 open Microsoft.AspNetCore.Http
+open WebApp.Infrastructure.Constants
 open WebApp.Views.UserPageView
 
 [<RequireQualifiedAccess>]
