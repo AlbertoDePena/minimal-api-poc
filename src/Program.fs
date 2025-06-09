@@ -241,7 +241,7 @@ module Program =
             )
             |> ignore
 
-            app.MapGet("/", IndexHandler.renderPage).RequireAuthorization() |> ignore
+            IndexHandler.configureRoutes app |> ignore
 
             app.Run()
 
